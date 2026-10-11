@@ -24,3 +24,40 @@ Executar no Postman na ordem indicada; a mesma coleção é validada pelo teste 
 | T18 Estoque insuficiente | `POST /pedidos`; `{"unidadeId": 1, "canalPedido": "TOTEM", "itens": [{"produtoId": 1, "quantidade": 1000}], "formaPagamento": "MOCK"}` | Seed com saldo de 100; não adicionar estoque antes deste teste | HTTP 409; asserções na requisição homônima |
 | T19 Pedido inexistente | `GET /pedidos/999999999`; `Sem corpo` | Fluxo anterior concluído | HTTP 404; asserções na requisição homônima |
 | T20 Transição inválida | `PATCH /pedidos/{{pedidoId}}/status`; `{"status": "PRONTO"}` | Fluxo anterior concluído | HTTP 409; asserções na requisição homônima |
+
+## Critérios de aceitação e evidências por cenário
+
+A evidência de cada linha é a requisição de mesmo ID e nome em `docs/postman_collection.json`. T01–T13 validam a sequência operacional e T14–T20 validam erros; T08 é uma negativa de negócio do gateway, com HTTP 201 por registrar a tentativa. As asserções da coleção validam o conteúdo abaixo, além do status HTTP.
+
+| ID | Conteúdo esperado da resposta | Evidência e uso |
+|---|---|---|
+| T01 | perfil = CLIENTE | Requisição T01; cadastro sem elevação de perfil |
+| T02 | accessToken é uma string | Requisição T02; grava token para as próximas chamadas |
+| T03 | user.perfil = ADMIN | Requisição T03; grava adminToken em variável local |
+| T04 | items[0].produtoId = 1; precoCentavos = 2500 | Requisição T04; depende dos dados fictícios do seed |
+| T05 | consentimento = true | Requisição T05; fidelidade facultativa habilitada |
+| T06 | status = AGUARDANDO_PAGAMENTO; totalCentavos = 5000; canalPedido = TOTEM | Requisição T06; grava pedidoId |
+| T07 | id igual ao pedidoId de T06 | Requisição T07; mesma chave e corpo, sem novo pedido |
+| T08 | status = NEGADO | Requisição T08; tentativa recusada registrada |
+| T09 | status = APROVADO | Requisição T09; nova chave autoriza a progressão do pedido |
+| T10 | status = PRONTO | Requisição T10; usa token administrativo autorizado |
+| T11 | status = ENTREGUE | Requisição T11; entrega finaliza o fluxo |
+| T12 | saldo = 50 | Requisição T12; 50 reais pagos correspondem a 50 pontos |
+| T13 | items contém pedidoId com canalPedido = TOTEM | Requisição T13; filtro por canal e estado entregue |
+| T14 | error, message, details, timestamp, path e requestId | Requisição T14; erro 401 sem Authorization |
+| T15 | Mesmas seis chaves do padrão de erro | Requisição T15; erro 403 usando token CLIENTE |
+| T16 | Mesmas seis chaves do padrão de erro | Requisição T16; erro 422 por ausência do canal |
+| T17 | Mesmas seis chaves do padrão de erro | Requisição T17; erro 422 para canal OUTRO |
+| T18 | Mesmas seis chaves do padrão de erro | Requisição T18; erro 409 por quantidade superior ao saldo |
+| T19 | Mesmas seis chaves do padrão de erro | Requisição T19; erro 404 para pedido inexistente |
+| T20 | Mesmas seis chaves do padrão de erro | Requisição T20; erro 409 ao tentar reabrir pedido entregue |
+
+## Testes automatizados complementares
+
+| Teste JUnit | Entrada e pré-condição | Resultado verificado |
+|---|---|---|
+| auditoriaEOpenApi | Cliente cria pedido; ADMIN consulta GET /auditoria | HTTP 200; registro PEDIDO_CRIADO presente; canalPedido obrigatório no esquema |
+| cupomERecursoAusente | Pedido com NORDESTE10; depois unidadeId = 999 | Desconto produz totalCentavos = 4500; unidade ausente retorna 404 |
+| quantidadeFracionariaRejeitada | POST /pedidos com quantidade = 1.5 | HTTP 422; inteiro exigido |
+
+Esses três casos são testes Java, não requisições adicionais da coleção Postman. A coleção atual contém 20 cenários em lista; a organização em pastas e a inclusão de chamadas próprias de auditoria e unidade/produto inexistente permanecem melhorias pendentes. A suíte Java verifica comportamentos adicionais sem substituir os artefatos solicitados pela trilha.

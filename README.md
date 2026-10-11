@@ -9,7 +9,7 @@ O código da aplicação, os testes e as ferramentas de geração de documentaç
 - **JDK 21**, incluindo `java` e `javac`.
 - **Maven 3.9.11** ou outra versão compatível 3.9+.
 - H2 é uma dependência Maven; nenhum banco externo é necessário.
-- Bash para os comandos abaixo. Graphviz e fontes DejaVu são opcionais, apenas para regenerar diagramas/PDF; artefatos já estão incluídos.
+- Bash para os comandos abaixo. Graphviz e fontes Liberation Serif/DejaVu são opcionais, apenas para regenerar diagramas/PDF; artefatos já estão incluídos.
 
 ## Executar
 
@@ -108,12 +108,12 @@ src/test/java/br/com/raizes/      integração HTTP, coleção e documentação 
 scripts/                         ferramentas Java e comandos de Maven/JVM
 ```
 
-- [Relatório técnico PDF](docs/relatorio-tecnico.pdf) e [fonte](docs/relatorio.md).
+- [PDF acadêmico para entrega — RU 4937546](docs/4937546_Projeto_Back_End.pdf), [cópia com nome anterior](docs/relatorio-tecnico.pdf) e [fonte](docs/relatorio.md).
 - [DER PDF](docs/diagramas/der.pdf), [DER SVG](docs/diagramas/der.svg), casos de uso, classes e arquitetura em `docs/diagramas`.
 - [Contratos da API](docs/api.md), [OpenAPI](docs/openapi.json), [coleção](docs/postman_collection.json) e [sequência](docs/sequencia.md).
 - LGPD: BCrypt com custo 12, JWT com expiração, controle por perfil/unidade, auditoria sem credenciais, consentimento revogável e desidentificação que invalida os tokens existentes. IDs históricos permanecem, portanto não há garantia de anonimização irreversível em sistemas externos. Retenção automática não está implementada.
 
-Regenerar documentação com API iniciada (Graphviz e DejaVu instalados):
+Regenerar documentação com API iniciada (Graphviz, Liberation Serif e DejaVu instalados):
 
 ```bash
 ./scripts/mvn.sh test-compile org.apache.maven.plugins:maven-dependency-plugin:3.8.1:build-classpath -Dmdep.includeScope=test -Dmdep.outputFile=target/docs-classpath.txt
@@ -121,6 +121,15 @@ java -cp "target/test-classes:target/classes:$(cat target/docs-classpath.txt)" b
 ```
 
 `Documentation` é Java e usa PDFBox. Não há scripts Python de geração de PDF.
+
+O PDF único inclui capa, folha de rosto, sumário com páginas reais, seções do roteiro, referências, contratos, cenários de testes, evidências e diagramas. Formatação: A4, margens superior/esquerda de 3 cm e inferior/direita de 2 cm, fonte serifada de 12 pontos e espaçamento de 1,5 no texto; tabelas, códigos e referências usam espaçamento simples. Os diagramas ocupam páginas em paisagem. A numeração conta a partir da folha de rosto e aparece na introdução. Os dados de capa ficam em [docs/identificacao-academica.properties](docs/identificacao-academica.properties); curso, polo, cidade e semestre ainda dependem de informação do estudante. O nome Luciane Yanase Kanashiro foi obtido da capa do roteiro da Trilha Back-End. Campos `A INFORMAR` devem ser preenchidos antes da entrega. O manual ABNT institucional completo não foi fornecido e deve ser conferido no AVA.
+
+Para regenerar apenas o PDF, sem chamar a API nem alterar os diagramas:
+
+```bash
+./scripts/mvn.sh test-compile org.apache.maven.plugins:maven-dependency-plugin:3.8.1:build-classpath -Dmdep.includeScope=test -Dmdep.outputFile=target/docs-classpath.txt
+java -cp "target/test-classes:target/classes:$(cat target/docs-classpath.txt)" br.com.raizes.AcademicReport
+```
 
 ## Nuvem e publicação
 

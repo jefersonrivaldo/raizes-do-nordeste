@@ -27,7 +27,14 @@ Request:
 
 Response HTTP 200:
 
-Sem corpo.
+```json
+{
+  "id" : 1,
+  "nome" : "texto",
+  "perfil" : "CLIENTE",
+  "unidadeId" : 1
+}
+```
 
 Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
@@ -57,7 +64,14 @@ Request:
 
 Response HTTP 200:
 
-Sem corpo.
+```json
+{
+  "id" : 1,
+  "nome" : "texto",
+  "endereco" : "texto",
+  "active" : true
+}
+```
 
 Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
@@ -87,7 +101,14 @@ Request:
 
 Response HTTP 200:
 
-Sem corpo.
+```json
+{
+  "id" : 1,
+  "nome" : "texto",
+  "descricao" : "texto",
+  "active" : true
+}
+```
 
 Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
@@ -114,7 +135,12 @@ Request:
 
 Response HTTP 200:
 
-Sem corpo.
+```json
+{
+  "consentimento" : true,
+  "versao" : "texto"
+}
+```
 
 Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
@@ -143,7 +169,14 @@ Request:
 
 Response HTTP 201:
 
-Sem corpo.
+```json
+{
+  "id" : 1,
+  "nome" : "texto",
+  "perfil" : "CLIENTE",
+  "unidadeId" : 1
+}
+```
 
 Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
@@ -168,7 +201,18 @@ Sem corpo.
 
 Response HTTP 200:
 
-Sem corpo.
+```json
+{
+  "items" : [ {
+    "id" : 1,
+    "nome" : "texto",
+    "endereco" : "texto",
+    "active" : true
+  } ],
+  "page" : 1,
+  "limit" : 1
+}
+```
 
 Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
@@ -197,7 +241,14 @@ Request:
 
 Response HTTP 201:
 
-Sem corpo.
+```json
+{
+  "id" : 1,
+  "nome" : "texto",
+  "endereco" : "texto",
+  "active" : true
+}
+```
 
 Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
@@ -228,7 +279,13 @@ Request:
 
 Response HTTP 201:
 
-Sem corpo.
+```json
+{
+  "produtoId" : 1,
+  "quantidade" : 1,
+  "precoCentavos" : 1
+}
+```
 
 Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
@@ -253,7 +310,18 @@ Sem corpo.
 
 Response HTTP 200:
 
-Sem corpo.
+```json
+{
+  "items" : [ {
+    "id" : 1,
+    "nome" : "texto",
+    "descricao" : "texto",
+    "active" : true
+  } ],
+  "page" : 1,
+  "limit" : 1
+}
+```
 
 Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
@@ -282,7 +350,14 @@ Request:
 
 Response HTTP 201:
 
-Sem corpo.
+```json
+{
+  "id" : 1,
+  "nome" : "texto",
+  "descricao" : "texto",
+  "active" : true
+}
+```
 
 Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
@@ -309,7 +384,30 @@ Sem corpo.
 
 Response HTTP 200:
 
-Sem corpo.
+```json
+{
+  "items" : [ {
+    "id" : 1,
+    "clienteId" : 1,
+    "unidadeId" : 1,
+    "canalPedido" : "APP",
+    "status" : "AGUARDANDO_PAGAMENTO",
+    "subtotalCentavos" : 1,
+    "descontoCentavos" : 1,
+    "totalCentavos" : 1,
+    "pontosResgate" : 1,
+    "createdAt" : "texto",
+    "itens" : [ {
+      "produtoId" : 1,
+      "nome" : "texto",
+      "quantidade" : 1,
+      "precoUnitarioCentavos" : 1
+    } ]
+  } ],
+  "page" : 1,
+  "limit" : 1
+}
+```
 
 Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
@@ -331,19 +429,38 @@ Request:
 
 ```json
 {
+  "formaPagamento" : "MOCK",
   "itens" : [ {
-    "produtoId" : 1,
-    "quantidade" : 2
+    "quantidade" : 2,
+    "produtoId" : 1
   } ],
   "canalPedido" : "TOTEM",
-  "unidadeId" : 1,
-  "formaPagamento" : "MOCK"
+  "unidadeId" : 1
 }
 ```
 
 Response HTTP 201:
 
-Sem corpo.
+```json
+{
+  "id" : 1,
+  "clienteId" : 1,
+  "unidadeId" : 1,
+  "canalPedido" : "APP",
+  "status" : "AGUARDANDO_PAGAMENTO",
+  "subtotalCentavos" : 1,
+  "descontoCentavos" : 1,
+  "totalCentavos" : 1,
+  "pontosResgate" : 1,
+  "createdAt" : "texto",
+  "itens" : [ {
+    "produtoId" : 1,
+    "nome" : "texto",
+    "quantidade" : 1,
+    "precoUnitarioCentavos" : 1
+  } ]
+}
+```
 
 Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
@@ -369,7 +486,19 @@ Sem corpo.
 
 Response HTTP 200:
 
-Sem corpo.
+```json
+{
+  "items" : [ {
+    "id" : 1,
+    "pedidoId" : 1,
+    "status" : "texto",
+    "valorCentavos" : 1,
+    "payload" : { }
+  } ],
+  "page" : 1,
+  "limit" : 1
+}
+```
 
 Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
@@ -398,7 +527,15 @@ Request:
 
 Response HTTP 201:
 
-Sem corpo.
+```json
+{
+  "id" : 1,
+  "pedidoId" : 1,
+  "status" : "texto",
+  "valorCentavos" : 1,
+  "payload" : { }
+}
+```
 
 Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
@@ -419,14 +556,26 @@ Request:
 
 ```json
 {
-  "email" : "maria@example.com",
-  "senha" : "SenhaEstudo123!"
+  "senha" : "SenhaEstudo123!",
+  "email" : "maria@example.com"
 }
 ```
 
 Response HTTP 200:
 
-Sem corpo.
+```json
+{
+  "accessToken" : "texto",
+  "tokenType" : "texto",
+  "expiresIn" : 1,
+  "user" : {
+    "id" : 1,
+    "nome" : "texto",
+    "perfil" : "CLIENTE",
+    "unidadeId" : 1
+  }
+}
+```
 
 Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
@@ -454,7 +603,26 @@ Request:
 
 Response HTTP 200:
 
-Sem corpo.
+```json
+{
+  "id" : 1,
+  "clienteId" : 1,
+  "unidadeId" : 1,
+  "canalPedido" : "APP",
+  "status" : "AGUARDANDO_PAGAMENTO",
+  "subtotalCentavos" : 1,
+  "descontoCentavos" : 1,
+  "totalCentavos" : 1,
+  "pontosResgate" : 1,
+  "createdAt" : "texto",
+  "itens" : [ {
+    "produtoId" : 1,
+    "nome" : "texto",
+    "quantidade" : 1,
+    "precoUnitarioCentavos" : 1
+  } ]
+}
+```
 
 Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
@@ -477,7 +645,14 @@ Sem corpo.
 
 Response HTTP 200:
 
-Sem corpo.
+```json
+{
+  "id" : 1,
+  "nome" : "texto",
+  "perfil" : "CLIENTE",
+  "unidadeId" : 1
+}
+```
 
 Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
@@ -526,7 +701,17 @@ Sem corpo.
 
 Response HTTP 200:
 
-Sem corpo.
+```json
+{
+  "items" : [ {
+    "produtoId" : 1,
+    "quantidade" : 1,
+    "precoCentavos" : 1
+  } ],
+  "page" : 1,
+  "limit" : 1
+}
+```
 
 Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
@@ -552,7 +737,19 @@ Sem corpo.
 
 Response HTTP 200:
 
-Sem corpo.
+```json
+{
+  "items" : [ {
+    "produtoId" : 1,
+    "nome" : "texto",
+    "descricao" : "texto",
+    "precoCentavos" : 1,
+    "disponivel" : 1
+  } ],
+  "page" : 1,
+  "limit" : 1
+}
+```
 
 Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
@@ -576,7 +773,26 @@ Sem corpo.
 
 Response HTTP 200:
 
-Sem corpo.
+```json
+{
+  "id" : 1,
+  "clienteId" : 1,
+  "unidadeId" : 1,
+  "canalPedido" : "APP",
+  "status" : "AGUARDANDO_PAGAMENTO",
+  "subtotalCentavos" : 1,
+  "descontoCentavos" : 1,
+  "totalCentavos" : 1,
+  "pontosResgate" : 1,
+  "createdAt" : "texto",
+  "itens" : [ {
+    "produtoId" : 1,
+    "nome" : "texto",
+    "quantidade" : 1,
+    "precoUnitarioCentavos" : 1
+  } ]
+}
+```
 
 Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
@@ -599,7 +815,9 @@ Sem corpo.
 
 Response HTTP 200:
 
-Sem corpo.
+```json
+{ }
+```
 
 Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
@@ -624,7 +842,22 @@ Sem corpo.
 
 Response HTTP 200:
 
-Sem corpo.
+```json
+{
+  "saldo" : 1,
+  "consentimento" : true,
+  "consentimentoEm" : "texto",
+  "versao" : "texto",
+  "items" : [ {
+    "pedidoId" : 1,
+    "quantidade" : 1,
+    "motivo" : "texto",
+    "createdAt" : "texto"
+  } ],
+  "page" : 1,
+  "limit" : 1
+}
+```
 
 Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
@@ -649,7 +882,19 @@ Sem corpo.
 
 Response HTTP 200:
 
-Sem corpo.
+```json
+{
+  "items" : [ {
+    "id" : 1,
+    "actor_id" : 1,
+    "acao" : "texto",
+    "recurso" : "texto",
+    "created_at" : "texto"
+  } ],
+  "page" : 1,
+  "limit" : 1
+}
+```
 
 Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
