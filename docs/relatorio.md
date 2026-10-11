@@ -1,10 +1,14 @@
 # Raízes do Nordeste — relatório técnico de estudo
 
+Autor: Jeferson Rivaldo Santos
+
+RU: 4937546
+
 ## 1. Introdução e objetivos
 
 A rede de lanchonetes precisa integrar unidades com cardápio e estoque próprios, atendendo APP, TOTEM, BALCAO, PICKUP e WEB. Esta implementação acadêmica oferece uma API REST persistente que centraliza pedidos, pagamento simulado, operação da cozinha e fidelização. O canal de origem é obrigatório e consultável, permitindo acompanhamento operacional. O objetivo é fechar o fluxo pedido → pagamento mock → preparo → entrega, com validação de estoque e controle de acesso.
 
-Documento de referência: UNINTER_Roteiro_Back_End_Copia_Adaptada_Estudo.pdf (2026), cópia adaptada para estudo, fornecida pelo usuário. Antes da entrega institucional, conferir o roteiro oficial, preencher identificação acadêmica e adequar a formatação exigida. O relatório registra a implementação técnica; não comprova publicação no GitHub nem substitui revisão pelo estudante.
+Este relatório considera o Estudo de Caso e a Trilha Back-End da rede Raízes do Nordeste (UNINTER, 2026), nas versões editadas para estudo fornecidas pelo estudante. A solução prioriza o MVP executável e a documentação das decisões. Os atores são cliente, atendente, cozinha, gerente, administrador e gateway de pagamento simulado. Antes da entrega institucional, as orientações devem ser conferidas nos documentos oficiais completos e no manual acadêmico disponível no AVA.
 
 ## 2. Análise e requisitos
 
@@ -20,6 +24,10 @@ Documento de referência: UNINTER_Roteiro_Back_End_Copia_Adaptada_Estudo.pdf (20
 | RF08 | Fidelidade com consentimento e resgate | Implementado; 1 ponto por real efetivamente pago na entrega; resgate de 100 pontos = R$ 10 |
 | RF09 | Promoção/campanha | Implementado; cupom NORDESTE10: 10% sobre subtotal mínimo de R$ 50, sem vigência dinâmica |
 | RF10 | Privacidade e auditoria | Implementado; leitura de dados próprios, retirada de consentimento e desidentificação |
+| RF11 | Indicadores consolidados da matriz | Proposto; vendas por unidade/região, produtos mais vendidos e relatórios financeiros, com acesso restrito à gestão |
+| RF12 | Variações e sazonalidade do cardápio | Parcial; disponibilidade e preços locais implementados; vigência sazonal e receitas regionais propostas |
+| RF13 | Campanhas segmentadas | Proposto; segmentação por frequência com consentimento específico; coleta de idade não integra o MVP |
+| RF14 | Regras de funcionamento por unidade | Proposto; horários, capacidade da cozinha e metas operacionais demandam modelagem adicional |
 
 | ID | Requisito não funcional | Decisão e limite |
 |---|---|---|
@@ -34,6 +42,8 @@ Documento de referência: UNINTER_Roteiro_Back_End_Copia_Adaptada_Estudo.pdf (20
 
 Escolheu-se H2 para dispensar um serviço externo no ambiente de estudo. Locks transacionais por recurso protegem estoque e fidelidade; essa decisão limita a concorrência de uma rede em produção. Uma evolução real exige PostgreSQL, controle de concorrência, filas, backups, monitoramento e medição de carga. A integração mock foi escolhida por exigência do roteiro e não coleta dados de cartão.
 
+A priorização atende primeiro à venda consistente e rastreável, evitando estoque negativo e pagamento duplicado. Os indicadores gerenciais, a sazonalidade e as campanhas segmentadas são relevantes ao caso, mas ficam como evolução explicitamente documentada. Alta disponibilidade e desempenho em pico são requisitos de produção; o projeto apresenta mecanismos básicos e uma proposta de evolução, sem afirmar validação de carga ou disponibilidade contínua.
+
 ## 3. Modelagem e arquitetura
 
 Os diagramas estão em `docs/diagramas/`: casos de uso, DER completo, classes conceituais e arquitetura em SVG/PNG, com fontes DOT. A sequência do fluxo crítico está também em `docs/sequencia.md`.
@@ -41,6 +51,19 @@ Os diagramas estão em `docs/diagramas/`: casos de uso, DER completo, classes co
 A API valida DTOs Java com Bean Validation e aplica autenticação. Application orquestra transações e gateway. Domain define enums, transições, preços e regras de resgate/cupom. Infrastructure contém H2, migrations Flyway SQL, hashing, JWT e gateway simulado. O domínio é implementado com funções e registros persistentes; o diagrama de classes é uma visão conceitual dessas entidades, não uma alegação de ORM ou DDD completo.
 
 Uma unidade possui vários produtos em estoque, e cada produto pode estar em várias unidades; `stocks` usa PK composta (unidade_id, produto_id). Usuário possui pedidos, movimentos de fidelidade e auditoria. Pedido pertence a uma unidade e possui itens e tentativas de pagamento independentes. Itens guardam o nome/preço histórico do produto. Chaves de idempotência são únicas por ator e operação. A migration `V1__initial.sql` define todas as tabelas, PK, FK, CHECK e índices.
+
+| Tabela | Chaves e relacionamento | Integridade relevante |
+|---|---|---|
+| units / products | PK id; cadastros da unidade e do catálogo | Desativação preserva o histórico |
+| users | PK id; FK unidade_id opcional para equipe | Email único; perfil limitado; pontos não negativos |
+| stocks | PK composta unidade_id/produto_id; FK para units/products | Quantidade não negativa; preço positivo |
+| orders | PK id; FK cliente_id/unidade_id | Canal e status limitados por CHECK; total não negativo |
+| order_items | PK id; FK pedido_id/produto_id | Produto único por pedido; quantidade e preço positivos |
+| payments | PK id; FK pedido_id | Várias tentativas por pedido; status e payload persistidos |
+| stock_movements | PK id; FK composta para stocks; FK ator e pedido | Movimentação vinculada ao recurso e ao responsável |
+| loyalty_movements | PK id; FK user_id; FK pedido_id opcional | Entradas e débitos rastreáveis |
+| audit | PK id; FK actor_id | Ação, recurso e instante; sem credenciais |
+| idempotency | PK ator/operação/chave; FK actor_id | Fingerprint impede reuso da chave com outro conteúdo |
 
 ### Feature crítica: realizar pedido e solicitar pagamento
 
@@ -94,15 +117,25 @@ A coleção Postman possui 20 cenários ordenados, positivos e negativos, com te
 
 Os resultados são evidência da máquina atual e do código correspondente; novas alterações exigem nova execução. Importar a coleção não prova aprovação dos cenários. Contagem de testes, falhas e data real constam nos arquivos de evidência. Testes não publicam o ambiente nem validam restauração de snapshot em uma nova tarefa.
 
-## 7. Entrega técnica e conclusão
+## 7. Entrega técnica
 
-Código Java, migrations Flyway, scripts de JVM/Maven, pom.xml, seed, .env.example, README, OpenAPI, coleção, plano de testes e diagramas estão no checkout. O PDF técnico é gerado a partir deste relatório e dos diagramas. Repositório pretendido: https://github.com/jefersonrivaldo/raizes-do-nordeste ; o código e os documentos foram enviados à branch main após autorização do proprietário. As URLs de download sem login retornaram HTTP 404 nesta sessão; a visibilidade pública ainda precisa ser verificada. Acesso local ao Swagger usa a rota /docs com API iniciada; não foi realizado deploy público.
+Os artefatos incluem código Java, migrations Flyway, scripts de JVM/Maven, pom.xml, seed, .env.example, README, OpenAPI, coleção, plano de testes e diagramas. O documento único incorpora contratos, cenários, evidências sanitizadas e diagramas nos apêndices/anexos. Repositório: https://github.com/jefersonrivaldo/raizes-do-nordeste . A referência da revisão técnica é a branch main no commit 2384678, anterior à geração deste PDF. O conteúdo testado teve 32 testes aprovados, sem falhas ou testes ignorados.
 
-O fluxo crítico é implementado com persistência real e operações transacionais. As limitações são explicitadas para separar capacidades demonstradas de evoluções propostas. Para entrega acadêmica, o estudante deve revisar o código/relatório, inserir seus dados de identificação, verificar a versão oficial do roteiro, verificar a visibilidade do repositório e testar os links pelo acesso do avaliador. Histórico mínimo de cinco commits é uma recomendação do roteiro; não foi fabricado nesta implementação.
+Procedimento de reprodução: instalar JDK 21 e Maven 3.9+, executar ./scripts/mvn.sh verify, gerar a configuração local com java scripts/InitLocal.java e iniciar ./scripts/start.sh. A aplicação aplica Flyway e seed automaticamente; não é necessário criar um serviço H2 separado. O banco persistente fica em data/raizes.mv.db. Variáveis privadas são descritas em .env.example; o arquivo .env não deve ser publicado.
 
-## Referências
+Swagger local: http://localhost:8000/docs ; contrato OpenAPI: http://localhost:8000/openapi.json ; coleção: https://github.com/jefersonrivaldo/raizes-do-nordeste/blob/main/docs/postman_collection.json . As URLs locais são acessadas depois de iniciar a API na máquina do avaliador. Na coleção, definir baseUrl e adminPassword em ambiente privado, executar T01–T20 em ordem e usar o seed documentado. As instruções completas estão no README.
 
-UNINTER. Projeto Multidisciplinar, trilha Back-end: rede Raízes do Nordeste. Cópia adaptada para estudo, 2026, fornecida pelo usuário; documento oficial deve ser consultado.
+Situação de acesso: as URLs do GitHub sem autenticação retornaram HTTP 404 na verificação de 11 out. 2026. O acesso público ao repositório e à coleção permanece uma pendência de entrega. O ambiente local foi validado; não foi realizado deploy público. A apresentação de uma URL no relatório não comprova que ela esteja acessível ao avaliador.
+
+## 8. Conclusão
+
+O fluxo crítico é implementado com persistência real e operações transacionais. As limitações são explicitadas para separar capacidades demonstradas de evoluções propostas. Para entrega acadêmica, o estudante deve revisar o código/relatório, conferir seus dados de identificação, verificar a versão oficial do roteiro, verificar a visibilidade do repositório e testar os links pelo acesso do avaliador. Histórico mínimo de cinco commits é uma recomendação do roteiro; não foi fabricado nesta implementação.
+
+## REFERÊNCIAS
+
+UNINTER. Projeto Multidisciplinar: orientações e estudo de caso — rede Raízes do Nordeste. Versão editada para estudo, 2026. Arquivo fornecido pelo estudante: UNINTER_Estudo_de_Caso_Versao_Editada_Estudo.pdf. Contém omissões; o documento oficial prevalece.
+
+UNINTER. Projeto Multidisciplinar: trilha Back-End — rede Raízes do Nordeste. Versão editada para estudo, 2026. Arquivo fornecido pelo estudante: UNINTER_Trilha_Back_End_Versao_Editada_Estudo.pdf. Contém omissões; o documento oficial prevalece.
 
 BRASIL. Lei nº 13.709, de 14 de agosto de 2018 (LGPD). https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm . Referência normativa indicada, sem alegar consulta jurídica.
 

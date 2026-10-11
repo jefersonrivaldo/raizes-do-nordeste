@@ -7,11 +7,7 @@ import java.net.http.*;
 import java.nio.file.*;
 import java.util.*;
 import java.util.regex.*;
-import javax.imageio.ImageIO;
 import org.apache.pdfbox.pdmodel.*;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.font.PDType0Font;
-import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 
 /** Geração de contratos, DER e PDF inteiramente em Java. Execute após iniciar a API. */
 public class Documentation {
@@ -113,11 +109,10 @@ public class Documentation {
                                       text.append("\nResponse HTTP ")
                                           .append(r.getKey())
                                           .append(":\n\n");
-                                      var s =
-                                          r.getValue()
-                                              .path("content")
-                                              .path("application/json")
-                                              .get("schema");
+                                      var media = r.getValue().path("content");
+                                      var s = media.path("application/json").get("schema");
+                                      if (s == null && media.isObject() && !media.isEmpty())
+                                        s = media.elements().next().get("schema");
                                       if (s != null) appendExample(text, example(s));
                                       else text.append("Sem corpo.\n");
                                     }
@@ -232,87 +227,6 @@ public class Documentation {
   }
 
   static void pdf() throws Exception {
-    try (PDDocument document = new PDDocument()) {
-      PDType0Font font =
-          PDType0Font.load(
-              document, Path.of("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf").toFile());
-      PDPage page = null;
-      PDPageContentStream stream = null;
-      float y = 0;
-      int pageNo = 0;
-      for (String original : Files.readAllLines(Path.of("docs/relatorio.md"))) {
-        String line = original.replace("`", "");
-        boolean heading = line.startsWith("#");
-        line = line.replaceAll("^#+\\s*", "");
-        if (line.isBlank()) line = " ";
-        if (line.matches("\\|[|: -]+\\|")) continue;
-        float size = heading ? 13 : 9.5f;
-        float maxWidth = PDRectangle.A4.getWidth() - 110;
-        StringBuilder current = new StringBuilder();
-        List<String> wrapped = new ArrayList<>();
-        for (String word : line.split(" ")) {
-          String next = current.isEmpty() ? word : current + " " + word;
-          float width = font.getStringWidth(next) / 1000 * size;
-          if (width > maxWidth && !current.isEmpty()) {
-            wrapped.add(current.toString());
-            current = new StringBuilder(word);
-          } else current = new StringBuilder(next);
-        }
-        wrapped.add(current.toString());
-        for (String part : wrapped) {
-          if (page == null || y < 65) {
-            if (stream != null) stream.close();
-            page = new PDPage(PDRectangle.A4);
-            document.addPage(page);
-            stream = new PDPageContentStream(document, page);
-            y = 780;
-            pageNo++;
-            stream.beginText();
-            stream.setFont(font, 8);
-            stream.newLineAtOffset(55, 35);
-            stream.showText("Raízes do Nordeste — Java | " + pageNo);
-            stream.endText();
-          }
-          stream.beginText();
-          stream.setFont(font, size);
-          stream.newLineAtOffset(55, y);
-          stream.showText(part);
-          stream.endText();
-          y -= heading ? 21 : 15;
-        }
-        if (heading) y -= 5;
-      }
-      if (stream != null) stream.close();
-      for (String name : List.of("casos-de-uso", "classes", "arquitetura", "der")) {
-        var imagePage = new PDPage(PDRectangle.A4);
-        document.addPage(imagePage);
-        var image =
-            LosslessFactory.createFromImage(
-                document, ImageIO.read(Path.of("docs/diagramas/" + name + ".png").toFile()));
-        float scale = Math.min(485f / image.getWidth(), 670f / image.getHeight());
-        try (var content = new PDPageContentStream(document, imagePage)) {
-          content.beginText();
-          content.setFont(font, 15);
-          content.newLineAtOffset(55, 785);
-          content.showText("Diagrama — " + name);
-          content.endText();
-          content.drawImage(image, 55, 65, image.getWidth() * scale, image.getHeight() * scale);
-        }
-      }
-      document.getDocumentInformation().setTitle("Raízes do Nordeste — relatório técnico Java");
-      document.save("docs/relatorio-tecnico.pdf");
-    }
-    try (PDDocument document = new PDDocument()) {
-      var page = new PDPage(new PDRectangle(1190.55f, 841.89f));
-      document.addPage(page);
-      var image =
-          LosslessFactory.createFromImage(
-              document, ImageIO.read(Path.of("docs/diagramas/der.png").toFile()));
-      float scale = Math.min(1120f / image.getWidth(), 770f / image.getHeight());
-      try (var content = new PDPageContentStream(document, page)) {
-        content.drawImage(image, 35, 35, image.getWidth() * scale, image.getHeight() * scale);
-      }
-      document.save("docs/diagramas/der.pdf");
-    }
+    AcademicReport.generate();
   }
 }
