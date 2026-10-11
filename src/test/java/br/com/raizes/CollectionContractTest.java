@@ -94,7 +94,7 @@ class CollectionContractTest extends BaseApiTest {
     assertEquals(20, requests);
     assertEquals(40, assertions);
     Files.writeString(
-        Path.of("docs/evidencias-colecao-java.json"),
+        Path.of("target/evidencias-colecao-java.json"),
         json.writerWithDefaultPrettyPrinter()
                 .writeValueAsString(
                     Map.of(
