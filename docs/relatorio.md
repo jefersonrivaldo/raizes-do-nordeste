@@ -10,7 +10,7 @@ Documento de referência: UNINTER_Roteiro_Back_End_Copia_Adaptada_Estudo.pdf (20
 
 | ID | Requisito | Prioridade e evidência |
 |---|---|---|
-| RF01 | Cadastro e autenticação por token; autorização por perfil | Essencial; /usuarios, /auth/login; hash scrypt e JWT |
+| RF01 | Cadastro e autenticação por token; autorização por perfil | Essencial; /usuarios, /auth/login; hash BCrypt e JWT |
 | RF02 | Gestão da rede/unidades | Essencial; cadastro/atualização ADMIN; gerente atualiza sua unidade |
 | RF03 | Catálogo global e cardápio por unidade | Essencial; produtos, preços em centavos e disponibilidade |
 | RF04 | Criação e consulta de pedidos com itens e canalPedido | Essencial; canal obrigatório e filtro por canal/status |
@@ -23,24 +23,24 @@ Documento de referência: UNINTER_Roteiro_Back_End_Copia_Adaptada_Estudo.pdf (20
 
 | ID | Requisito não funcional | Decisão e limite |
 |---|---|---|
-| RNF01 | Segurança | JWT HS256 com expiração, hash scrypt, perfis e vínculo com unidade; HTTPS deve ser configurado no deploy |
-| RNF02 | Integridade | FK/CHECK/UNIQUE e transação BEGIN IMMEDIATE; estoque, pontos e pedido confirmam juntos |
+| RNF01 | Segurança | JWT HS256 com expiração, hash BCrypt, perfis e vínculo com unidade; HTTPS deve ser configurado no deploy |
+| RNF02 | Integridade | FK/CHECK/UNIQUE e transação Spring JDBC com bloqueios FOR UPDATE; estoque, pontos e pedido confirmam juntos |
 | RNF03 | Rastreabilidade | Auditoria de operações sensíveis e leituras; requestId por resposta; sem senha/token nos registros |
 | RNF04 | Documentação | Swagger /docs, OpenAPI exportado e contratos de entrada/saída tipados |
 | RNF05 | Desempenho | Paginação até 100 registros e índices de busca; testes de concorrência; sem alegar benchmark de produção |
-| RNF06 | Disponibilidade | Healthcheck com consulta real ao banco; SQLite local não oferece alta disponibilidade |
+| RNF06 | Disponibilidade | Healthcheck com consulta real ao banco; H2 local não oferece alta disponibilidade |
 | RNF07 | Tolerância a falhas | Mock indisponível gera registro ERRO; nova chave permite nova tentativa; não autoriza cozinha antes de aprovação |
-| RNF08 | Reprodutibilidade | Python 3.12, lock com hashes, migrations versionadas, seed idempotente e testes isolados |
+| RNF08 | Reprodutibilidade | Java 21, versões Maven fixadas e checksums estritos, migrations versionadas, seed idempotente e testes isolados |
 
-Escolheu-se SQLite para dispensar um serviço externo no ambiente de estudo. Escritas são serializadas para proteger estoque e fidelidade; essa decisão limita a concorrência de uma rede em produção. Uma evolução real exige PostgreSQL, controle de concorrência, filas, backups, monitoramento e medição de carga. A integração mock foi escolhida por exigência do roteiro e não coleta dados de cartão.
+Escolheu-se H2 para dispensar um serviço externo no ambiente de estudo. Locks transacionais por recurso protegem estoque e fidelidade; essa decisão limita a concorrência de uma rede em produção. Uma evolução real exige PostgreSQL, controle de concorrência, filas, backups, monitoramento e medição de carga. A integração mock foi escolhida por exigência do roteiro e não coleta dados de cartão.
 
 ## 3. Modelagem e arquitetura
 
 Os diagramas estão em `docs/diagramas/`: casos de uso, DER completo, classes conceituais e arquitetura em SVG/PNG, com fontes DOT. A sequência do fluxo crítico está também em `docs/sequencia.md`.
 
-A API valida contratos Pydantic e aplica autenticação. Application orquestra transações e gateway. Domain define enums, transições, preços e regras de resgate/cupom. Infrastructure contém SQLite, migrations SQL, hashing, JWT e gateway simulado. O domínio é implementado com funções e registros persistentes; o diagrama de classes é uma visão conceitual dessas entidades, não uma alegação de ORM ou DDD completo.
+A API valida DTOs Java com Bean Validation e aplica autenticação. Application orquestra transações e gateway. Domain define enums, transições, preços e regras de resgate/cupom. Infrastructure contém H2, migrations Flyway SQL, hashing, JWT e gateway simulado. O domínio é implementado com funções e registros persistentes; o diagrama de classes é uma visão conceitual dessas entidades, não uma alegação de ORM ou DDD completo.
 
-Uma unidade possui vários produtos em estoque, e cada produto pode estar em várias unidades; `stocks` usa PK composta (unidade_id, produto_id). Usuário possui pedidos, movimentos de fidelidade e auditoria. Pedido pertence a uma unidade e possui itens e tentativas de pagamento independentes. Itens guardam o nome/preço histórico do produto. Chaves de idempotência são únicas por ator e operação. A migration `001_initial.sql` define todas as tabelas, PK, FK, CHECK e índices.
+Uma unidade possui vários produtos em estoque, e cada produto pode estar em várias unidades; `stocks` usa PK composta (unidade_id, produto_id). Usuário possui pedidos, movimentos de fidelidade e auditoria. Pedido pertence a uma unidade e possui itens e tentativas de pagamento independentes. Itens guardam o nome/preço histórico do produto. Chaves de idempotência são únicas por ator e operação. A migration `V1__initial.sql` define todas as tabelas, PK, FK, CHECK e índices.
 
 ### Feature crítica: realizar pedido e solicitar pagamento
 
@@ -78,7 +78,7 @@ Dados coletados: nome, email e hash de senha para identificação/autenticação
 
 Finalidade e bases legais propostas: execução de contrato para pedidos e conta; consentimento específico facultativo para fidelidade; logs estritamente necessários à segurança devem ter base e retenção revisadas pelo controlador. A descrição técnica não constitui parecer jurídico. A fidelidade é opcional e consentimento pode ser retirado por PUT /fidelidade/consentimento. O saldo é zerado em retirada, com movimento de histórico e evento de auditoria. A versão e o instante do consentimento/revogação são persistidos; o histórico de alterações consta na auditoria.
 
-Senhas: scrypt com salt aleatório por usuário (N=16384, r=8, p=1); comparação em tempo constante; jamais retornadas. JWT: HS256, sub/iat/exp/iss/aud obrigatórios, expiração padrão de 3600 segundos e segredo aleatório local de 256 bits. O perfil ativo é consultado no banco a cada requisição, portanto alteração de perfil e desativação se aplicam a tokens já emitidos. A chave privada .env tem permissões 0600 e está ignorada pelo Git.
+Senhas: BCrypt com salt aleatório por usuário (custo 12); comparação em tempo constante; jamais retornadas. JWT: HS256, sub/iat/exp/iss/aud obrigatórios, expiração padrão de 3600 segundos e segredo aleatório local de 256 bits. O perfil ativo é consultado no banco a cada requisição, portanto alteração de perfil e desativação se aplicam a tokens já emitidos. A chave privada .env tem permissões 0600 e está ignorada pelo Git.
 
 Autorização: clientes acessam somente recursos próprios; empregados só recursos da unidade atribuída; ADMIN administra a rede. Logs de leitura de perfil/pedidos/pagamentos/fidelidade/auditoria e eventos de criação/status/estoque/consentimento usam apenas IDs e ação, sem credenciais, email, corpo de requisição ou dados de cartão. O endpoint de auditoria é exclusivo do ADMIN.
 
@@ -90,13 +90,13 @@ Antes de produção: definir política de retenção aplicável, HTTPS, armazena
 
 ## 6. Plano de testes e evidências
 
-A coleção Postman possui 20 cenários ordenados, positivos e negativos, com testes de status e conteúdo. `docs/plano-testes.md` apresenta entrada, pré-condições e resultado esperado de cada cenário; `docs/evidencias-postman.json` é o resumo sanitizado da execução real via Newman. A suíte pytest possui 28 testes em banco temporário, incluindo concorrência de estoque/idempotência, isolamento entre clientes/unidades, pagamento negado/indisponível, consentimento, anonimização e repetição de migrations/seed. `docs/evidencias-pytest.xml` registra a execução atual.
+A coleção Postman possui 20 cenários ordenados, positivos e negativos, com testes de status e conteúdo. `docs/plano-testes.md` apresenta entrada, pré-condições e resultado esperado de cada cenário; `docs/evidencias-colecao-java.json` é o resumo sanitizado da execução real em Java via JUnit e HttpClient. A suíte JUnit 5 possui 32 testes em banco temporário, incluindo concorrência de estoque/idempotência, isolamento entre clientes/unidades, pagamento negado/indisponível, consentimento, anonimização e repetição de migrations/seed. `docs/evidencias-junit-api.xml e docs/evidencias-junit-colecao.xml` registra a execução atual.
 
 Os resultados são evidência da máquina atual e do código correspondente; novas alterações exigem nova execução. Importar a coleção não prova aprovação dos cenários. Contagem de testes, falhas e data real constam nos arquivos de evidência. Testes não publicam o ambiente nem validam restauração de snapshot em uma nova tarefa.
 
 ## 7. Entrega técnica e conclusão
 
-Código, migrations, scripts, lock, seed, .env.example, README, OpenAPI, coleção, plano de testes e diagramas estão no checkout. O PDF técnico é gerado a partir deste relatório e dos diagramas. Repositório pretendido: https://github.com/jefersonrivaldo/raizes-do-nordeste ; o código e os documentos foram enviados à branch main após autorização do proprietário. As URLs de download sem login retornaram HTTP 404 nesta sessão; a visibilidade pública ainda precisa ser verificada. Acesso local ao Swagger usa a rota /docs com API iniciada; não foi realizado deploy público.
+Código Java, migrations Flyway, scripts de JVM/Maven, pom.xml, seed, .env.example, README, OpenAPI, coleção, plano de testes e diagramas estão no checkout. O PDF técnico é gerado a partir deste relatório e dos diagramas. Repositório pretendido: https://github.com/jefersonrivaldo/raizes-do-nordeste ; o código e os documentos foram enviados à branch main após autorização do proprietário. As URLs de download sem login retornaram HTTP 404 nesta sessão; a visibilidade pública ainda precisa ser verificada. Acesso local ao Swagger usa a rota /docs com API iniciada; não foi realizado deploy público.
 
 O fluxo crítico é implementado com persistência real e operações transacionais. As limitações são explicitadas para separar capacidades demonstradas de evoluções propostas. Para entrega acadêmica, o estudante deve revisar o código/relatório, inserir seus dados de identificação, verificar a versão oficial do roteiro, verificar a visibilidade do repositório e testar os links pelo acesso do avaliador. Histórico mínimo de cinco commits é uma recomendação do roteiro; não foi fabricado nesta implementação.
 
@@ -106,8 +106,8 @@ UNINTER. Projeto Multidisciplinar, trilha Back-end: rede Raízes do Nordeste. C�
 
 BRASIL. Lei nº 13.709, de 14 de agosto de 2018 (LGPD). https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm . Referência normativa indicada, sem alegar consulta jurídica.
 
-FASTAPI. Documentação oficial. https://fastapi.tiangolo.com/ . Referência técnica para aprofundamento.
+SPRING. Documentação oficial do Spring Boot. https://docs.spring.io/spring-boot/ . Referência técnica para aprofundamento.
 
-SQLITE. Transactions. https://www.sqlite.org/lang_transaction.html . Referência técnica para aprofundamento.
+H2. Documentação do banco H2. https://h2database.com/html/main.html . Referência técnica para aprofundamento.
 
 OWASP. Password Storage Cheat Sheet. https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html . Referência para revisão de configuração em produção.

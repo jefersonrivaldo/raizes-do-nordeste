@@ -1,125 +1,131 @@
-# Raízes do Nordeste
+# Raízes do Nordeste — Java
 
-API de estudo para uma rede de lanchonetes, construída a partir do roteiro Back-end fornecido. Integra pedidos de APP, TOTEM, BALCAO, PICKUP e WEB, com estoque por unidade, pagamento mock, perfis e fidelidade.
+Back-end **100% Java 21**, com Spring Boot 3.5.6, Spring Security, JDBC, Flyway e H2 persistente em arquivo. A API atende APP, TOTEM, BALCAO, PICKUP e WEB, com pedidos, estoque por unidade, pagamento mock, perfis, fidelidade e auditoria.
+
+O código da aplicação, os testes e as ferramentas de geração de documentação são Java. Os arquivos `.sh` apenas iniciam Maven/JVM; não há implementação Python ou Node. A coleção Postman contém os testes JavaScript exigidos pelo próprio formato Postman e também é executada por um teste JUnit Java, sem Node instalado.
 
 ## Requisitos
 
-- Python **3.12**, SQLite incluído na biblioteca padrão; sem servidor de banco externo.
-- Bash para os scripts de execução; instalação usa PyPI com TLS e hashes.
-- Node.js 24 + Newman 6.2.1 somente para executar a coleção via CLI (Postman pode importá-la sem Node).
-- Graphviz e ReportLab somente para regenerar os diagramas/PDF; arquivos já estão incluídos.
+- **JDK 21**, incluindo `java` e `javac`.
+- **Maven 3.9.11** ou outra versão compatível 3.9+.
+- H2 é uma dependência Maven; nenhum banco externo é necessário.
+- Bash para os comandos abaixo. Graphviz e fontes DejaVu são opcionais, apenas para regenerar diagramas/PDF; artefatos já estão incluídos.
 
-## Execução do zero
+## Executar
 
-Dentro do checkout:
+Na raiz do checkout:
 
 ```bash
-cd /workspace/raizes-do-nordeste
-./scripts/install.sh
-.venv/bin/python scripts/init_local.py
-./scripts/seed.sh
+# No ambiente da nuvem, se JDK/Maven ainda não estiverem preparados:
+./scripts/toolchains.sh
+./scripts/mvn.sh verify
+# Cria configuração local privada sem sobrescrever .env existente:
+java scripts/InitLocal.java
 ./scripts/start.sh
 ```
 
-Em uma máquina local, use o caminho do seu clone. O install cria `.venv`, instala o lock com verificação SHA-256 e aplica migrations. `init_local.py` cria `.env` privado com JWT e senha de seed aleatórios, sem imprimir valores ou substituir um arquivo existente. O seed cria duas unidades e três produtos, com 100 unidades de cada produto por loja. Reexecutá-lo **não redefine** senhas/saldos existentes. A API usa a porta 8000 (ou PORT no ambiente).
+Na máquina de onboarding, use o Java do JDK instalado caso seu comando `java` aponte para outra versão:
 
-O Swagger usa a rota **`/docs`**, e o OpenAPI usa **`/openapi.json`** no endereço local da API. Também há documentação offline em [docs/api.md](docs/api.md) e [docs/openapi.json](docs/openapi.json). Healthcheck: `GET /health` deve retornar `{"status":"ok","database":"ok"}`. O onboarding não fornece preview web público.
+```bash
+/workspace/toolchains/jdk/jdk-21.0.8+9/bin/java scripts/InitLocal.java
+```
 
-### Configuração
+Em máquina local com JDK 21 e Maven, também pode usar `mvn verify` e `java -jar target/raizes-do-nordeste-1.0.0.jar` depois de carregar as variáveis do `.env` no processo. A JVM não lê `.env` automaticamente; `scripts/start.sh` faz isso. No Linux/Bash: `set -a; source .env; set +a`.
 
-`.env.example` documenta DATABASE_PATH, JWT_SECRET, TOKEN_TTL_SECONDS e SEED_ADMIN_PASSWORD. Você pode criar `.env` manualmente usando esses nomes. JWT_SECRET precisa de 32+ caracteres; senha administrativa precisa de 12+ caracteres, letras e números. Não use valores de exemplo como segredo real. Os scripts seed/start carregam `.env`; comandos Python diretos usam as variáveis do processo.
+O Maven instala dependências, compila, executa os testes e gera o JAR. A aplicação aplica migrations Flyway e seed idempotente no início. O seed cria `admin@raizes.local`, duas unidades e três produtos, com 100 unidades de estoque por produto/unidade. Não redefine senhas nem saldos existentes. O banco de desenvolvimento fica em `data/raizes.mv.db` e sobrevive a reinícios.
 
-- DATABASE_PATH: `data/raizes.sqlite3`, relativo à raiz do checkout.
-- JWT_SECRET: chave de assinatura local. É preservada nos reinícios; trocá-la invalida os tokens anteriores.
-- TOKEN_TTL_SECONDS: 3600 por padrão.
-- SEED_ADMIN_PASSWORD: usada somente ao criar `admin@raizes.local`. A senha aleatória fica no `.env` privado; consulte-a **localmente**, sem publicar arquivo ou exportar credenciais da coleção.
+Swagger: rota **`/docs`** (redireciona para Swagger UI). OpenAPI: **`/openapi.json`**. Healthcheck: `GET /health` retorna `{"status":"ok","database":"ok"}`. Porta padrão 8000; pode ser alterada por PORT. Não há preview web público no onboarding.
 
-Não há credenciais externas nem processamento real de pagamento. `.env`, `.venv` e bancos locais estão ignorados pelo Git. Em publicação/snapshot de desenvolvimento, a chave local pode ser retida no filesystem privado; a configuração salva não contém seus valores. Nunca reutilize os segredos de estudo em produção.
+## Variáveis e credenciais
 
-## Fluxo funcional
+Veja `.env.example`. `scripts/InitLocal.java` gera JWT_SECRET e SEED_ADMIN_PASSWORD aleatórios em `.env` privado (0600 quando suportado), sem exibir valores. Arquivo existente é preservado.
 
-1. `POST /usuarios` com nome, email e senha cria CLIENTE; perfil administrativo não pode ser escolhido no cadastro público.
-2. `POST /auth/login` retorna JWT. No Swagger, use Authorize com o accessToken. Fora dele, use `Authorization: Bearer <token>`.
-3. Consulte `/unidades/1/cardapio` para preços/disponibilidade.
-4. `POST /pedidos` exige `Idempotency-Key` (8–100 caracteres) e canalPedido. Exemplo:
+| Variável | Uso |
+|---|---|
+| JWT_SECRET | Segredo de pelo menos 32 bytes, obrigatório para assinar JWT |
+| TOKEN_TTL_SECONDS | Expiração de 1 a 86400 segundos; padrão 3600 |
+| SEED_ADMIN_PASSWORD | Criação inicial do ADMIN; 12 a 72 bytes, letras e números; consulte apenas localmente |
+| DATABASE_URL | Padrão `jdbc:h2:file:./data/raizes;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=10000` |
+| DATABASE_PASSWORD | Opcional para banco local; para outro ambiente configure conforme sua política |
+| SEED_ENABLED | true por padrão; false desativa o seed |
+| PORT | 8000 por padrão |
+
+Nunca publique `.env`, banco local ou tokens. Segredos não são embutidos no código/JAR nem na configuração salva da nuvem. Não existem serviços externos de pagamento ou dados de cartão. O usuário `sa` do H2 é apenas conexão interna; o console H2 não está exposto.
+
+## Fluxo principal
+
+1. `POST /usuarios` cadastra CLIENTE; não aceita perfil escolhido pelo público.
+2. `POST /auth/login` retorna accessToken. Use `Authorization: Bearer <token>`; no Swagger, informe o token em Authorize.
+3. Consulte `/unidades/1/cardapio`.
+4. Crie pedido em `POST /pedidos`, com `Idempotency-Key` de 8–100 caracteres:
 
 ```json
 {"unidadeId":1,"canalPedido":"TOTEM","itens":[{"produtoId":1,"quantidade":2}],"formaPagamento":"MOCK"}
 ```
 
-5. `POST /pedidos/{id}/pagamentos`, com nova Idempotency-Key, recebe `{"cenario":"APROVAR"}`. NEGAR/INDISPONIVEL simulam falhas persistidas. Apenas aprovação muda o pedido para EM_PREPARO.
-6. Cozinha/equipe autorizada marca PRONTO e atendimento marca ENTREGUE por PATCH `/pedidos/{id}/status`.
-7. Com consentimento ativo, a entrega credita 1 ponto por real do total pago. Resgate de 100 pontos reduz R$ 10 no pedido; use pontosResgate múltiplo de 100. Cupom NORDESTE10 dá 10% em subtotal mínimo de R$ 50.
+5. `POST /pedidos/{id}/pagamentos`, com nova chave, recebe `{"cenario":"APROVAR"}`. NEGAR e INDISPONIVEL simulam falhas. HTTP 201 significa tentativa persistida; examine status APROVADO/NEGADO/ERRO no corpo.
+6. Apenas aprovação leva a EM_PREPARO. Cozinha/equipe marca PRONTO; atendimento/gerente/admin marca ENTREGUE via PATCH `/pedidos/{id}/status`.
+7. Consentimento facultativo em `/fidelidade/consentimento`: 1 ponto por real efetivamente pago é creditado na entrega. Resgate de 100 pontos reduz R$ 10, usando pontosResgate múltiplo de 100. Cupom NORDESTE10 dá 10% sobre subtotal mínimo de R$ 50.
 
-A criação baixa estoque e reserva pontos em uma transação. Cancelamento devolve estoque uma vez e estorna pagamento mock aprovado. Cliente só pode cancelar pedido não pago. Os preços históricos permanecem nos itens. Dinheiro é representado em centavos inteiros. NEGADO/ERRO retorna HTTP 201 porque a tentativa foi registrada; o resultado do gateway está no corpo. Reenvio idempotente devolve o recurso existente no estado atual.
+Pedidos baixam estoque e debitam resgate dentro da mesma transação. Locks por usuário/pedido/estoque impedem efeitos duplicados e venda além do saldo. Itens são bloqueados em ordem de produto para reduzir disputas. Dinheiro usa `long` em centavos. Cancelamento devolve estoque uma vez e estorna pagamento mock aprovado. Cliente só cancela enquanto aguarda pagamento; cozinha apenas marca PRONTO. Pedido entregue é terminal. Reenvio da mesma chave/corpo retorna o recurso no estado atual.
 
-## Perfis e unidades
+## Perfis
 
 | Perfil | Permissões |
 |---|---|
-| CLIENTE | Pedidos próprios, pagamento próprio, cancelamento antes de pagar, fidelidade e desidentificação própria |
-| ATENDENTE | Criar/pagar pedidos para clienteId na unidade vinculada; operar status/cancelar |
-| COZINHA | Consultar pedidos da unidade e marcar PRONTO |
-| GERENTE | Atendimento e estoque da própria unidade; atualização de sua unidade |
-| ADMIN | Toda a rede, catálogo, unidades, atribuição de perfis e auditoria |
+| CLIENTE | Recursos próprios, pagamento, cancelamento antes de pagar, fidelidade e desidentificação |
+| ATENDENTE | Atendimento de clientes da unidade vinculada, pagamentos e status |
+| COZINHA | Consulta da unidade e marcação PRONTO |
+| GERENTE | Atendimento e estoque da unidade; atualização de sua unidade |
+| ADMIN | Toda a rede, unidades, catálogo, perfis e auditoria |
 
-Crie conta para empregado por POST /usuarios; autenticado como ADMIN, faça PUT `/usuarios/{id}/perfil` com `{"perfil":"COZINHA","unidadeId":1}`. Perfis operacionais exigem unidade. ADMIN e CLIENTE não recebem vínculo operacional. Usuário que já possui pedidos deve permanecer CLIENTE. Empregado informa clienteId na criação de pedido. Não há fluxo anônimo de cliente de totem neste MVP.
+Crie uma conta de empregado por POST /usuarios. Como ADMIN, atribua perfil com PUT `/usuarios/{id}/perfil`, corpo `{"perfil":"COZINHA","unidadeId":1}`. Perfis operacionais exigem unidade; ADMIN/CLIENTE não recebem vínculo. Empregado informa clienteId na criação do pedido. Cliente com pedidos deve manter perfil CLIENTE. Não existe atendimento anônimo de totem neste MVP.
 
-## Testes
-
-### Automatizados
+## Testes — todos em Java
 
 ```bash
-.venv/bin/python -m pytest -q
+./scripts/mvn.sh verify
+# Alternativa em máquina com Maven/JDK configurados:
+mvn verify
 ```
 
-Os testes usam bancos temporários e segredos fictícios; não alteram o banco de desenvolvimento. Há 28 cenários, incluindo disputa pelo último estoque, idempotência concorrente, limites de perfil/unidade, pagamento negado, revogação de consentimento e desidentificação. Evidência da execução preparada: [docs/evidencias-pytest.xml](docs/evidencias-pytest.xml).
+A suíte JUnit 5 executa 31 testes de integração e um teste que percorre as **20 requisições da coleção**, com 40 grupos de asserções equivalentes ao fluxo Postman: **32 testes JUnit**, sem testes pulados. Usa servidor HTTP real em porta aleatória e banco H2 em memória exclusivo, sem tocar na base de desenvolvimento. Cobre concorrência, idempotência, 401/403/422/409, estoque, negativas/indisponibilidade de pagamento, consentimento, anonimização e repetição de seed.
 
-### Postman / Newman
+Evidências ficam em `target/surefire-reports`; resumos sanitizados desta execução estão em `docs/evidencias-junit-api.xml`, `docs/evidencias-junit-colecao.xml` e `docs/evidencias-colecao-java.json`. A evidência é da versão e da máquina em que os testes rodaram; importar a coleção não comprova sucesso.
 
-Importe [docs/postman_collection.json](docs/postman_collection.json). Configure baseUrl para a API local e **adminPassword em um ambiente local privado**, com a senha definida no seed. A coleção cria cliente fictício novo por execução, faz login e guarda os tokens em variáveis; rode T01–T20 em ordem. Não exporte variáveis/token/senha da sessão para o repositório. Plano e entradas: [docs/plano-testes.md](docs/plano-testes.md).
+Para usar Postman, importe [docs/postman_collection.json](docs/postman_collection.json), configure baseUrl para sua API e adminPassword em ambiente local privado. Execute T01–T20 em ordem; cliente e chave são gerados a cada execução. Não exporte senha/tokens da sessão. A coleção movimenta duas unidades do produto 1 no banco utilizado. Plano: [docs/plano-testes.md](docs/plano-testes.md). Ela também é executada por `CollectionContractTest` em Java; Newman não é necessário.
 
-Via CLI, sem passar senha como argumento:
-
-```bash
-npm install --prefix /workspace/onboarding-tools --cache /workspace/.npm-cache --no-audit --no-fund newman@6.2.1
-NODE_PATH=/workspace/onboarding-tools/node_modules node scripts/run_collection.cjs
-```
-
-O executor lê apenas a senha necessária do `.env` local ou SEED_ADMIN_PASSWORD do processo. API_BASE_URL pode alterar o destino local. Ele grava um resumo sem credenciais em [docs/evidencias-postman.json](docs/evidencias-postman.json). A coleção movimenta estoque real da base em uso (duas unidades do produto 1 por execução); para testes repetidos extensivos, use banco exclusivo. Não redefina estoque de desenvolvimento indiscriminadamente. O teste T18 pressupõe estoque inferior a 1000 unidades.
-
-## Estrutura e documentação
+## Organização e entrega
 
 ```text
-app/domain/          enums, transições, descontos e erros de negócio
-app/application/     casos de uso, transações e autorização por recurso
-app/infrastructure/  SQLite, migrations, seed, segurança e gateway mock
-app/api/             rotas, contratos, autorização por perfil e exemplos
-migrations/          SQL versionado com FK, CHECK e índices
-tests/               suíte isolada de integração e concorrência
-scripts/             instalação, inicialização e geração de artefatos
-docs/                relatório, contratos, coleção, evidências e diagramas
+src/main/java/br/com/raizes/
+  domain/          enums, ator, transições, descontos e erros de negócio
+  application/     casos de uso transacionais e autorização por recurso
+  infrastructure/  JDBC, JWT, Spring Security, seed e gateway mock
+  api/             controllers, DTOs, validação, Swagger e erros
+src/main/resources/db/migration/  migrations Flyway SQL
+src/test/java/br/com/raizes/      integração HTTP, coleção e documentação Java
+scripts/                         ferramentas Java e comandos de Maven/JVM
 ```
 
-- [Relatório técnico PDF](docs/relatorio-tecnico.pdf) e [fonte editável](docs/relatorio.md).
-- [DER em PDF](docs/diagramas/der.pdf), [SVG ampliável](docs/diagramas/der.svg) e fonte DOT; compatíveis com a migration.
-- [Casos de uso](docs/diagramas/casos-de-uso.svg), [classes conceituais](docs/diagramas/classes.svg), [arquitetura](docs/diagramas/arquitetura.svg) e [sequência](docs/sequencia.md).
-- Contratos completos no Swagger e docs/api.md; padrão de erro uniforme, paginação e exemplos.
-- LGPD e justificativas em docs/relatorio.md, incluindo dados/finalidades, consentimento, desidentificação, auditoria e retenção proposta.
+- [Relatório técnico PDF](docs/relatorio-tecnico.pdf) e [fonte](docs/relatorio.md).
+- [DER PDF](docs/diagramas/der.pdf), [DER SVG](docs/diagramas/der.svg), casos de uso, classes e arquitetura em `docs/diagramas`.
+- [Contratos da API](docs/api.md), [OpenAPI](docs/openapi.json), [coleção](docs/postman_collection.json) e [sequência](docs/sequencia.md).
+- LGPD: BCrypt com custo 12, JWT com expiração, controle por perfil/unidade, auditoria sem credenciais, consentimento revogável e desidentificação que invalida os tokens existentes. IDs históricos permanecem, portanto não há garantia de anonimização irreversível em sistemas externos. Retenção automática não está implementada.
 
-Para regenerar artefatos, mantenha o banco migrado e execute da raiz:
+Regenerar documentação com API iniciada (Graphviz e DejaVu instalados):
 
 ```bash
-.venv/bin/python -m scripts.generate_collection
-.venv/bin/python -m scripts.generate_docs
-# Opcional: após instalar Graphviz, fontes DejaVu e requirements-docs.txt em seu ambiente Python:
-python -m scripts.generate_report
+./scripts/mvn.sh test-compile org.apache.maven.plugins:maven-dependency-plugin:3.8.1:build-classpath -Dmdep.includeScope=test -Dmdep.outputFile=target/docs-classpath.txt
+java -cp "target/test-classes:target/classes:$(cat target/docs-classpath.txt)" br.com.raizes.Documentation
 ```
 
-A geração de contratos não modifica o banco de negócio. Graphviz é necessário para gerar os diagramas. Para instalar dependências opcionais de PDF no venv: `.venv/bin/python -m pip install -r requirements-docs.txt`, depois `.venv/bin/python -m scripts.generate_report`. A máquina de onboarding já dispõe dessas ferramentas no Python do sistema.
+`Documentation` é Java e usa PDFBox. Não há scripts Python de geração de PDF.
 
-## Limites e entrega acadêmica
+## Nuvem e publicação
 
-API e banco foram verificados nesta máquina; isso não comprova publicação ou restauração em nova tarefa. SQLite serializa escritas, não foi feito benchmark para rede real e não há alta disponibilidade. Rate limiting, TLS público, migração para PostgreSQL, expiração automática de pedidos não pagos, refresh/logout individual e retenção automática são evoluções. Nenhum cartão é coletado; gateway e estorno são mock. Desidentificação mantém IDs históricos, portanto não garante anonimização irreversível fora desta base.
+Use o checkout existente; cada tarefa já tem ambiente isolado, sem criar worktrees. Dependências e arquivos podem ser retidos no snapshot, mas a JVM precisa ser reiniciada em uma nova tarefa. `install_script` e `start_skill` são instruções salvas; salvar não executa nem publica o ambiente.
 
-O PDF de referência é uma **cópia adaptada para estudo**. Confira a versão oficial e revise a implementação; preencha seus dados acadêmicos e ajuste formatação institucional antes da entrega. Não foi fabricado histórico de cinco commits nem realizado deploy. Repositório pretendido: https://github.com/jefersonrivaldo/raizes-do-nordeste . O código e o relatório foram enviados à branch main após autorização do proprietário. O acesso aos links sem login retornou HTTP 404 nesta sessão; entre na conta GitHub com acesso ao repositório para baixar os arquivos. A visibilidade pública ainda precisa ser verificada pelo proprietário.
+O código Java foi preparado para envio autorizado à branch main de https://github.com/jefersonrivaldo/raizes-do-nordeste . Os links de download sem login retornaram 404 nesta sessão; entre na sua conta GitHub com acesso ao repositório. A visibilidade pública para avaliação ainda deve ser verificada pelo proprietário. Não foi feito deploy público ou fabricado histórico acadêmico de commits.
+
+O roteiro fornecido é uma cópia adaptada para estudo. Revise a versão oficial, o código e o relatório; preencha identificação acadêmica e ajuste formatação exigida antes da entrega. H2 em arquivo é destinado ao estudo, sem alta disponibilidade validada. TLS público, rate limiting, banco de produção, backup, expiração de reservas e retenção automática são evoluções propostas. Pagamento e estorno são exclusivamente mock.

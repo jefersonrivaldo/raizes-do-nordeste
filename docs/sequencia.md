@@ -5,13 +5,13 @@ sequenceDiagram
     actor Cliente
     participant API
     participant Aplicacao
-    participant DB as SQLite
+    participant DB as H2
     participant Gateway as Gateway mock
     actor Cozinha
     actor Atendimento
     Cliente->>API: POST /pedidos + JWT + canalPedido + chave
     API->>Aplicacao: Contrato validado e ator autorizado
-    Aplicacao->>DB: BEGIN IMMEDIATE; verificar estoque/pontos
+    Aplicacao->>DB: Transação Spring JDBC + FOR UPDATE; verificar estoque/pontos
     alt disponível
         Aplicacao->>DB: Pedido + itens + baixa + auditoria + idempotência
         Aplicacao->>DB: COMMIT

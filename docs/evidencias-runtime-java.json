@@ -1,0 +1,10 @@
+{
+  "tecnologia" : "Java 21 / Spring Boot / H2 / Flyway",
+  "swagger" : true,
+  "persistenciaAposReinicio" : true,
+  "health" : true,
+  "pedidoId" : 1,
+  "openapiCompatível" : true,
+  "status" : "ENTREGUE",
+  "executadoEm" : "2026-10-11T15:21:49.935522835Z"
+}

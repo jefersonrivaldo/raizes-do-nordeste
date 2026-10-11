@@ -6,5 +6,6 @@ if [[ -f .env ]]; then
   source .env
   set +a
 fi
-.venv/bin/python -m app.infrastructure.database
-exec .venv/bin/python -m uvicorn app.api.main:app --host 0.0.0.0 --port "${PORT:-8000}"
+raizes_java=${JAVA_HOME:-/workspace/toolchains/jdk/jdk-21.0.8+9}/bin/java
+if [[ ! -x "$raizes_java" ]]; then raizes_java=$(command -v java); fi
+exec "$raizes_java" -jar target/raizes-do-nordeste-1.0.0.jar

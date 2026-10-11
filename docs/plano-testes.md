@@ -1,6 +1,6 @@
 # Plano de testes executável
 
-Executar na ordem indicada com banco criado pelo seed. Cada cenário tem asserções na coleção. CLIENTE é criado em cada execução; adminPassword é configurado localmente e não deve ser exportado. Unidade 1 e produto 1 vêm do seed.
+Executar no Postman na ordem indicada; a mesma coleção é validada pelo teste Java CollectionContractTest. Executar na ordem indicada com banco criado pelo seed. Cada cenário tem asserções na coleção. CLIENTE é criado em cada execução; adminPassword é configurado localmente e não deve ser exportado. Unidade 1 e produto 1 vêm do seed.
 
 | ID | Requisição e entrada | Pré-condição | Saída esperada |
 |---|---|---|---|
