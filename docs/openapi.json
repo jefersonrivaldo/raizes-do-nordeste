@@ -1,0 +1,5153 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Raízes do Nordeste",
+    "description": "API acadêmica multicanal. Valores em centavos. Pagamento exclusivamente MOCK. Cadastre um cliente, faça login e use Bearer token em Authorize. Rotas operacionais exigem vínculo com a unidade, exceto ADMIN. Listagens são paginadas.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "Operação"
+        ],
+        "summary": "Verificar API e banco",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                },
+                "example": {
+                  "status": "ok",
+                  "database": "ok"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Perfil ou unidade sem permissão",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de regra de negócio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Contrato inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco temporariamente ocupado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/usuarios": {
+      "post": {
+        "tags": [
+          "Usuários"
+        ],
+        "summary": "Cadastrar cliente público",
+        "operationId": "register_usuarios_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cadastro"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioResponse"
+                },
+                "example": {
+                  "id": 2,
+                  "nome": "Maria de estudo",
+                  "perfil": "CLIENTE",
+                  "unidadeId": null
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Perfil ou unidade sem permissão",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de regra de negócio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Contrato inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco temporariamente ocupado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "summary": "Autenticar e emitir JWT",
+        "operationId": "login_auth_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Login"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                },
+                "example": {
+                  "accessToken": "<JWT emitido no login>",
+                  "tokenType": "Bearer",
+                  "expiresIn": 3600,
+                  "user": {
+                    "id": 2,
+                    "nome": "Maria de estudo",
+                    "perfil": "CLIENTE",
+                    "unidadeId": null
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Perfil ou unidade sem permissão",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de regra de negócio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Contrato inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco temporariamente ocupado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/usuarios/me": {
+      "get": {
+        "tags": [
+          "Usuários"
+        ],
+        "summary": "Consultar perfil próprio (JWT)",
+        "operationId": "me_usuarios_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioResponse"
+                },
+                "example": {
+                  "id": 2,
+                  "nome": "Maria de estudo",
+                  "perfil": "CLIENTE",
+                  "unidadeId": null
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Perfil ou unidade sem permissão",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de regra de negócio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Contrato inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco temporariamente ocupado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Usuários"
+        ],
+        "summary": "Anonimizar cliente (CLIENTE, sem pedidos em aberto)",
+        "operationId": "anonymize_usuarios_me_delete",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Perfil ou unidade sem permissão",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de regra de negócio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Contrato inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco temporariamente ocupado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/usuarios/{id}/perfil": {
+      "put": {
+        "tags": [
+          "Usuários"
+        ],
+        "summary": "Definir perfil e unidade (ADMIN)",
+        "operationId": "profile_usuarios__id__perfil_put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Vinculo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioResponse"
+                },
+                "example": {
+                  "id": 2,
+                  "nome": "Maria de estudo",
+                  "perfil": "CLIENTE",
+                  "unidadeId": null
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Perfil ou unidade sem permissão",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de regra de negócio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Contrato inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco temporariamente ocupado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/unidades": {
+      "get": {
+        "tags": [
+          "Unidades"
+        ],
+        "summary": "Listar unidades (público)",
+        "operationId": "units_unidades_get",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponse_UnidadeResponse_"
+                },
+                "example": {
+                  "items": [
+                    {
+                      "id": 1,
+                      "nome": "Recife Centro",
+                      "endereco": "Rua comercial, 100",
+                      "active": true
+                    }
+                  ],
+                  "page": 1,
+                  "limit": 1
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Perfil ou unidade sem permissão",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de regra de negócio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Contrato inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco temporariamente ocupado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Unidades"
+        ],
+        "summary": "Cadastrar unidade (ADMIN)",
+        "operationId": "new_unit_unidades_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Unidade"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnidadeResponse"
+                },
+                "example": {
+                  "id": 1,
+                  "nome": "Recife Centro",
+                  "endereco": "Rua comercial, 100",
+                  "active": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Perfil ou unidade sem permissão",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de regra de negócio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Contrato inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco temporariamente ocupado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/unidades/{id}": {
+      "put": {
+        "tags": [
+          "Unidades"
+        ],
+        "summary": "Atualizar unidade (ADMIN ou GERENTE da unidade)",
+        "operationId": "update_unit_unidades__id__put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Unidade"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnidadeResponse"
+                },
+                "example": {
+                  "id": 1,
+                  "nome": "Recife Centro",
+                  "endereco": "Rua comercial, 100",
+                  "active": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Perfil ou unidade sem permissão",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de regra de negócio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Contrato inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco temporariamente ocupado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/produtos": {
+      "get": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Listar catálogo (público)",
+        "operationId": "products_produtos_get",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponse_ProdutoResponse_"
+                },
+                "example": {
+                  "items": [
+                    {
+                      "id": 1,
+                      "nome": "Baião de dois",
+                      "descricao": "Porção individual",
+                      "active": true
+                    }
+                  ],
+                  "page": 1,
+                  "limit": 1
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Perfil ou unidade sem permissão",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de regra de negócio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Contrato inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco temporariamente ocupado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Cadastrar produto no catálogo global (ADMIN)",
+        "operationId": "new_product_produtos_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Produto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProdutoResponse"
+                },
+                "example": {
+                  "id": 1,
+                  "nome": "Baião de dois",
+                  "descricao": "Porção individual",
+                  "active": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Perfil ou unidade sem permissão",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de regra de negócio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Contrato inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco temporariamente ocupado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/produtos/{id}": {
+      "put": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Atualizar produto global (ADMIN)",
+        "operationId": "update_product_produtos__id__put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Produto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProdutoResponse"
+                },
+                "example": {
+                  "id": 1,
+                  "nome": "Baião de dois",
+                  "descricao": "Porção individual",
+                  "active": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Perfil ou unidade sem permissão",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de regra de negócio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Contrato inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco temporariamente ocupado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/unidades/{id}/cardapio": {
+      "get": {
+        "tags": [
+          "Cardápio"
+        ],
+        "summary": "Consultar preços e disponibilidade por unidade (público)",
+        "operationId": "menu_unidades__id__cardapio_get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponse_CardapioResponse_"
+                },
+                "example": {
+                  "items": [
+                    {
+                      "produtoId": 1,
+                      "nome": "Baião de dois",
+                      "descricao": "Porção individual",
+                      "precoCentavos": 2500,
+                      "disponivel": 100
+                    }
+                  ],
+                  "page": 1,
+                  "limit": 1
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Perfil ou unidade sem permissão",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de regra de negócio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Contrato inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco temporariamente ocupado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/unidades/{id}/estoque": {
+      "get": {
+        "tags": [
+          "Estoque"
+        ],
+        "summary": "Consultar estoque próprio (ADMIN ou GERENTE)",
+        "operationId": "stock_unidades__id__estoque_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponse_EstoqueResponse_"
+                },
+                "example": {
+                  "items": [
+                    {
+                      "produtoId": 1,
+                      "quantidade": 100,
+                      "precoCentavos": 2500
+                    }
+                  ],
+                  "page": 1,
+                  "limit": 1
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Perfil ou unidade sem permissão",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de regra de negócio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Contrato inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco temporariamente ocupado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/unidades/{id}/estoque/movimentos": {
+      "post": {
+        "tags": [
+          "Estoque"
+        ],
+        "summary": "Movimentar estoque e definir preço (ADMIN ou GERENTE da unidade)",
+        "operationId": "move_stock_unidades__id__estoque_movimentos_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Estoque"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EstoqueResponse"
+                },
+                "example": {
+                  "produtoId": 1,
+                  "quantidade": 100,
+                  "precoCentavos": 2500
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Perfil ou unidade sem permissão",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de regra de negócio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Contrato inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco temporariamente ocupado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pedidos": {
+      "post": {
+        "tags": [
+          "Pedidos"
+        ],
+        "summary": "Criar pedido (CLIENTE próprio ou equipe de atendimento; Idempotency-Key obrigatório)",
+        "operationId": "create_order_pedidos_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Pedido"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PedidoResponse"
+                },
+                "example": {
+                  "id": 1,
+                  "clienteId": 2,
+                  "unidadeId": 1,
+                  "canalPedido": "TOTEM",
+                  "status": "AGUARDANDO_PAGAMENTO",
+                  "subtotalCentavos": 5000,
+                  "descontoCentavos": 0,
+                  "totalCentavos": 5000,
+                  "pontosResgate": 0,
+                  "createdAt": "2026-10-11T15:00:00+00:00",
+                  "itens": [
+                    {
+                      "produtoId": 1,
+                      "nome": "Baião de dois",
+                      "quantidade": 2,
+                      "precoUnitarioCentavos": 2500
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Perfil ou unidade sem permissão",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de regra de negócio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Contrato inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco temporariamente ocupado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Pedidos"
+        ],
+        "summary": "Listar pedidos autorizados, filtrados por canal e status (JWT)",
+        "operationId": "orders_pedidos_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "canalPedido",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Canal"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Canalpedido"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Status"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponse_PedidoResponse_"
+                },
+                "example": {
+                  "items": [
+                    {
+                      "id": 1,
+                      "clienteId": 2,
+                      "unidadeId": 1,
+                      "canalPedido": "TOTEM",
+                      "status": "AGUARDANDO_PAGAMENTO",
+                      "subtotalCentavos": 5000,
+                      "descontoCentavos": 0,
+                      "totalCentavos": 5000,
+                      "pontosResgate": 0,
+                      "createdAt": "2026-10-11T15:00:00+00:00",
+                      "itens": [
+                        {
+                          "produtoId": 1,
+                          "nome": "Baião de dois",
+                          "quantidade": 2,
+                          "precoUnitarioCentavos": 2500
+                        }
+                      ]
+                    }
+                  ],
+                  "page": 1,
+                  "limit": 1
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Perfil ou unidade sem permissão",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de regra de negócio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Contrato inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco temporariamente ocupado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pedidos/{id}": {
+      "get": {
+        "tags": [
+          "Pedidos"
+        ],
+        "summary": "Consultar pedido autorizado (JWT)",
+        "operationId": "order_pedidos__id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PedidoResponse"
+                },
+                "example": {
+                  "id": 1,
+                  "clienteId": 2,
+                  "unidadeId": 1,
+                  "canalPedido": "TOTEM",
+                  "status": "AGUARDANDO_PAGAMENTO",
+                  "subtotalCentavos": 5000,
+                  "descontoCentavos": 0,
+                  "totalCentavos": 5000,
+                  "pontosResgate": 0,
+                  "createdAt": "2026-10-11T15:00:00+00:00",
+                  "itens": [
+                    {
+                      "produtoId": 1,
+                      "nome": "Baião de dois",
+                      "quantidade": 2,
+                      "precoUnitarioCentavos": 2500
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Perfil ou unidade sem permissão",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de regra de negócio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Contrato inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco temporariamente ocupado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pedidos/{id}/status": {
+      "patch": {
+        "tags": [
+          "Pedidos"
+        ],
+        "summary": "Avançar status ou cancelar conforme perfil e unidade",
+        "operationId": "status_order_pedidos__id__status_patch",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MudancaStatus"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PedidoResponse"
+                },
+                "example": {
+                  "id": 1,
+                  "clienteId": 2,
+                  "unidadeId": 1,
+                  "canalPedido": "TOTEM",
+                  "status": "AGUARDANDO_PAGAMENTO",
+                  "subtotalCentavos": 5000,
+                  "descontoCentavos": 0,
+                  "totalCentavos": 5000,
+                  "pontosResgate": 0,
+                  "createdAt": "2026-10-11T15:00:00+00:00",
+                  "itens": [
+                    {
+                      "produtoId": 1,
+                      "nome": "Baião de dois",
+                      "quantidade": 2,
+                      "precoUnitarioCentavos": 2500
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Perfil ou unidade sem permissão",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de regra de negócio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Contrato inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco temporariamente ocupado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pedidos/{id}/pagamentos": {
+      "post": {
+        "tags": [
+          "Pagamentos"
+        ],
+        "summary": "Solicitar pagamento mock (CLIENTE próprio ou atendimento; Idempotency-Key obrigatório)",
+        "operationId": "pay_pedidos__id__pagamentos_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Pagamento"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagamentoResponse"
+                },
+                "example": {
+                  "id": 1,
+                  "pedidoId": 1,
+                  "status": "APROVADO",
+                  "valorCentavos": 5000,
+                  "payload": {
+                    "gateway": "MOCK",
+                    "referencia": "mock-1",
+                    "status": "APROVADO",
+                    "valorCentavos": 5000,
+                    "mensagem": "Pagamento aprovado."
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Perfil ou unidade sem permissão",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de regra de negócio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Contrato inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco temporariamente ocupado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Pagamentos"
+        ],
+        "summary": "Consultar pagamentos autorizados (JWT)",
+        "operationId": "payments_pedidos__id__pagamentos_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponse_PagamentoResponse_"
+                },
+                "example": {
+                  "items": [
+                    {
+                      "id": 1,
+                      "pedidoId": 1,
+                      "status": "APROVADO",
+                      "valorCentavos": 5000,
+                      "payload": {
+                        "gateway": "MOCK",
+                        "referencia": "mock-1",
+                        "status": "APROVADO",
+                        "valorCentavos": 5000,
+                        "mensagem": "Pagamento aprovado."
+                      }
+                    }
+                  ],
+                  "page": 1,
+                  "limit": 1
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Perfil ou unidade sem permissão",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de regra de negócio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Contrato inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco temporariamente ocupado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fidelidade/consentimento": {
+      "put": {
+        "tags": [
+          "Fidelidade"
+        ],
+        "summary": "Registrar ou revogar consentimento próprio (CLIENTE)",
+        "operationId": "consent_fidelidade_consentimento_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Consentimento"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentimentoResponse"
+                },
+                "example": {
+                  "consentimento": true,
+                  "versao": "1.0"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Perfil ou unidade sem permissão",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de regra de negócio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Contrato inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco temporariamente ocupado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/fidelidade": {
+      "get": {
+        "tags": [
+          "Fidelidade"
+        ],
+        "summary": "Consultar saldo e histórico próprio (CLIENTE)",
+        "operationId": "loyalty_fidelidade_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FidelidadeResponse"
+                },
+                "example": {
+                  "saldo": 50,
+                  "consentimento": true,
+                  "consentimentoEm": "2026-10-11T15:00:00+00:00",
+                  "versao": "1.0",
+                  "items": [
+                    {
+                      "pedidoId": 1,
+                      "quantidade": 50,
+                      "motivo": "COMPRA",
+                      "createdAt": "2026-10-11T15:00:00+00:00"
+                    }
+                  ],
+                  "page": 1,
+                  "limit": 20
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Perfil ou unidade sem permissão",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de regra de negócio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Contrato inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco temporariamente ocupado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auditoria": {
+      "get": {
+        "tags": [
+          "Auditoria"
+        ],
+        "summary": "Consultar ações sensíveis (ADMIN)",
+        "operationId": "audit_auditoria_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponse_AuditoriaResponse_"
+                },
+                "example": {
+                  "items": [
+                    {
+                      "id": 1,
+                      "actor_id": 2,
+                      "acao": "PEDIDO_CRIADO",
+                      "recurso": "1",
+                      "created_at": "2026-10-11T15:00:00+00:00"
+                    }
+                  ],
+                  "page": 1,
+                  "limit": 1
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Perfil ou unidade sem permissão",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de regra de negócio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Contrato inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco temporariamente ocupado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "ESTOQUE_INSUFICIENTE",
+                  "message": "Estoque insuficiente na unidade.",
+                  "details": [],
+                  "timestamp": "2026-10-11T15:00:00+00:00",
+                  "path": "/pedidos",
+                  "requestId": "00000000-0000-4000-8000-000000000001"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AuditoriaResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "actor_id": {
+            "type": "integer",
+            "title": "Actor Id"
+          },
+          "acao": {
+            "type": "string",
+            "title": "Acao"
+          },
+          "recurso": {
+            "type": "string",
+            "title": "Recurso"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "actor_id",
+          "acao",
+          "recurso",
+          "created_at"
+        ],
+        "title": "AuditoriaResponse",
+        "example": {
+          "id": 1,
+          "actor_id": 2,
+          "acao": "PEDIDO_CRIADO",
+          "recurso": "1",
+          "created_at": "2026-10-11T15:00:00+00:00"
+        }
+      },
+      "Cadastro": {
+        "properties": {
+          "nome": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Nome"
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "minLength": 5,
+            "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$",
+            "title": "Email"
+          },
+          "senha": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 10,
+            "title": "Senha"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "nome",
+          "email",
+          "senha"
+        ],
+        "title": "Cadastro",
+        "example": {
+          "nome": "Maria de estudo",
+          "email": "maria@example.com",
+          "senha": "SenhaEstudo123!"
+        }
+      },
+      "Canal": {
+        "type": "string",
+        "enum": [
+          "APP",
+          "TOTEM",
+          "BALCAO",
+          "PICKUP",
+          "WEB"
+        ],
+        "title": "Canal"
+      },
+      "CardapioResponse": {
+        "properties": {
+          "produtoId": {
+            "type": "integer",
+            "title": "Produtoid"
+          },
+          "nome": {
+            "type": "string",
+            "title": "Nome"
+          },
+          "descricao": {
+            "type": "string",
+            "title": "Descricao"
+          },
+          "precoCentavos": {
+            "type": "integer",
+            "title": "Precocentavos"
+          },
+          "disponivel": {
+            "type": "integer",
+            "title": "Disponivel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "produtoId",
+          "nome",
+          "descricao",
+          "precoCentavos",
+          "disponivel"
+        ],
+        "title": "CardapioResponse",
+        "example": {
+          "produtoId": 1,
+          "nome": "Baião de dois",
+          "descricao": "Porção individual",
+          "precoCentavos": 2500,
+          "disponivel": 100
+        }
+      },
+      "Consentimento": {
+        "properties": {
+          "consentimento": {
+            "type": "boolean",
+            "title": "Consentimento"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "consentimento"
+        ],
+        "title": "Consentimento",
+        "example": {
+          "consentimento": true
+        }
+      },
+      "ConsentimentoResponse": {
+        "properties": {
+          "consentimento": {
+            "type": "boolean",
+            "title": "Consentimento"
+          },
+          "versao": {
+            "type": "string",
+            "title": "Versao"
+          }
+        },
+        "type": "object",
+        "required": [
+          "consentimento",
+          "versao"
+        ],
+        "title": "ConsentimentoResponse",
+        "example": {
+          "consentimento": true,
+          "versao": "1.0"
+        }
+      },
+      "ErrorDetail": {
+        "properties": {
+          "field": {
+            "type": "string",
+            "title": "Field"
+          },
+          "issue": {
+            "type": "string",
+            "title": "Issue"
+          }
+        },
+        "type": "object",
+        "required": [
+          "field",
+          "issue"
+        ],
+        "title": "ErrorDetail"
+      },
+      "ErrorResponse": {
+        "properties": {
+          "error": {
+            "type": "string",
+            "title": "Error"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "details": {
+            "items": {
+              "$ref": "#/components/schemas/ErrorDetail"
+            },
+            "type": "array",
+            "title": "Details"
+          },
+          "timestamp": {
+            "type": "string",
+            "title": "Timestamp"
+          },
+          "path": {
+            "type": "string",
+            "title": "Path"
+          },
+          "requestId": {
+            "type": "string",
+            "title": "Requestid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "error",
+          "message",
+          "details",
+          "timestamp",
+          "path",
+          "requestId"
+        ],
+        "title": "ErrorResponse",
+        "example": {
+          "error": "ESTOQUE_INSUFICIENTE",
+          "message": "Estoque insuficiente na unidade.",
+          "details": [],
+          "timestamp": "2026-10-11T15:00:00+00:00",
+          "path": "/pedidos",
+          "requestId": "00000000-0000-4000-8000-000000000001"
+        }
+      },
+      "Estoque": {
+        "properties": {
+          "produtoId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Produtoid"
+          },
+          "quantidade": {
+            "type": "integer",
+            "maximum": 100000.0,
+            "minimum": -100000.0,
+            "title": "Quantidade"
+          },
+          "precoCentavos": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10000000.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Precocentavos"
+          },
+          "motivo": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 3,
+            "title": "Motivo"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "produtoId",
+          "quantidade",
+          "motivo"
+        ],
+        "title": "Estoque",
+        "example": {
+          "produtoId": 1,
+          "quantidade": 10,
+          "precoCentavos": 2500,
+          "motivo": "Reposição"
+        }
+      },
+      "EstoqueResponse": {
+        "properties": {
+          "produtoId": {
+            "type": "integer",
+            "title": "Produtoid"
+          },
+          "quantidade": {
+            "type": "integer",
+            "title": "Quantidade"
+          },
+          "precoCentavos": {
+            "type": "integer",
+            "title": "Precocentavos"
+          }
+        },
+        "type": "object",
+        "required": [
+          "produtoId",
+          "quantidade",
+          "precoCentavos"
+        ],
+        "title": "EstoqueResponse",
+        "example": {
+          "produtoId": 1,
+          "quantidade": 100,
+          "precoCentavos": 2500
+        }
+      },
+      "FidelidadeResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MovimentoFidelidadeResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "saldo": {
+            "type": "integer",
+            "title": "Saldo"
+          },
+          "consentimento": {
+            "type": "boolean",
+            "title": "Consentimento"
+          },
+          "consentimentoEm": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consentimentoem"
+          },
+          "versao": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Versao"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "limit",
+          "saldo",
+          "consentimento",
+          "consentimentoEm",
+          "versao"
+        ],
+        "title": "FidelidadeResponse",
+        "example": {
+          "saldo": 50,
+          "consentimento": true,
+          "consentimentoEm": "2026-10-11T15:00:00+00:00",
+          "versao": "1.0",
+          "items": [
+            {
+              "pedidoId": 1,
+              "quantidade": 50,
+              "motivo": "COMPRA",
+              "createdAt": "2026-10-11T15:00:00+00:00"
+            }
+          ],
+          "page": 1,
+          "limit": 20
+        }
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "ok",
+            "title": "Status"
+          },
+          "database": {
+            "type": "string",
+            "const": "ok",
+            "title": "Database"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "database"
+        ],
+        "title": "HealthResponse",
+        "example": {
+          "status": "ok",
+          "database": "ok"
+        }
+      },
+      "Item": {
+        "properties": {
+          "produtoId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Produtoid"
+          },
+          "quantidade": {
+            "type": "integer",
+            "maximum": 1000.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Quantidade"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "produtoId",
+          "quantidade"
+        ],
+        "title": "Item"
+      },
+      "ItemResponse": {
+        "properties": {
+          "produtoId": {
+            "type": "integer",
+            "title": "Produtoid"
+          },
+          "nome": {
+            "type": "string",
+            "title": "Nome"
+          },
+          "quantidade": {
+            "type": "integer",
+            "title": "Quantidade"
+          },
+          "precoUnitarioCentavos": {
+            "type": "integer",
+            "title": "Precounitariocentavos"
+          }
+        },
+        "type": "object",
+        "required": [
+          "produtoId",
+          "nome",
+          "quantidade",
+          "precoUnitarioCentavos"
+        ],
+        "title": "ItemResponse",
+        "example": {
+          "produtoId": 1,
+          "nome": "Baião de dois",
+          "quantidade": 2,
+          "precoUnitarioCentavos": 2500
+        }
+      },
+      "Login": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "minLength": 5,
+            "title": "Email"
+          },
+          "senha": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Senha"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "email",
+          "senha"
+        ],
+        "title": "Login",
+        "example": {
+          "email": "maria@example.com",
+          "senha": "SenhaEstudo123!"
+        }
+      },
+      "LoginResponse": {
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "title": "Accesstoken"
+          },
+          "tokenType": {
+            "type": "string",
+            "title": "Tokentype"
+          },
+          "expiresIn": {
+            "type": "integer",
+            "title": "Expiresin"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UsuarioResponse"
+          }
+        },
+        "type": "object",
+        "required": [
+          "accessToken",
+          "tokenType",
+          "expiresIn",
+          "user"
+        ],
+        "title": "LoginResponse",
+        "example": {
+          "accessToken": "<JWT emitido no login>",
+          "tokenType": "Bearer",
+          "expiresIn": 3600,
+          "user": {
+            "id": 2,
+            "nome": "Maria de estudo",
+            "perfil": "CLIENTE",
+            "unidadeId": null
+          }
+        }
+      },
+      "MovimentoFidelidadeResponse": {
+        "properties": {
+          "pedidoId": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pedidoid"
+          },
+          "quantidade": {
+            "type": "integer",
+            "title": "Quantidade"
+          },
+          "motivo": {
+            "type": "string",
+            "title": "Motivo"
+          },
+          "createdAt": {
+            "type": "string",
+            "title": "Createdat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "pedidoId",
+          "quantidade",
+          "motivo",
+          "createdAt"
+        ],
+        "title": "MovimentoFidelidadeResponse"
+      },
+      "MudancaStatus": {
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "MudancaStatus",
+        "example": {
+          "status": "PRONTO"
+        }
+      },
+      "Pagamento": {
+        "properties": {
+          "cenario": {
+            "type": "string",
+            "enum": [
+              "APROVAR",
+              "NEGAR",
+              "INDISPONIVEL"
+            ],
+            "title": "Cenario",
+            "default": "APROVAR"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Pagamento",
+        "example": {
+          "cenario": "APROVAR"
+        }
+      },
+      "PagamentoResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "pedidoId": {
+            "type": "integer",
+            "title": "Pedidoid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "APROVADO",
+              "NEGADO",
+              "ERRO",
+              "ESTORNADO"
+            ],
+            "title": "Status"
+          },
+          "valorCentavos": {
+            "type": "integer",
+            "title": "Valorcentavos"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Payload"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "pedidoId",
+          "status",
+          "valorCentavos",
+          "payload"
+        ],
+        "title": "PagamentoResponse",
+        "example": {
+          "id": 1,
+          "pedidoId": 1,
+          "status": "APROVADO",
+          "valorCentavos": 5000,
+          "payload": {
+            "gateway": "MOCK",
+            "referencia": "mock-1",
+            "status": "APROVADO",
+            "valorCentavos": 5000,
+            "mensagem": "Pagamento aprovado."
+          }
+        }
+      },
+      "PageResponse_AuditoriaResponse_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AuditoriaResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "limit"
+        ],
+        "title": "PageResponse[AuditoriaResponse]"
+      },
+      "PageResponse_CardapioResponse_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CardapioResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "limit"
+        ],
+        "title": "PageResponse[CardapioResponse]"
+      },
+      "PageResponse_EstoqueResponse_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/EstoqueResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "limit"
+        ],
+        "title": "PageResponse[EstoqueResponse]"
+      },
+      "PageResponse_PagamentoResponse_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PagamentoResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "limit"
+        ],
+        "title": "PageResponse[PagamentoResponse]"
+      },
+      "PageResponse_PedidoResponse_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PedidoResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "limit"
+        ],
+        "title": "PageResponse[PedidoResponse]"
+      },
+      "PageResponse_ProdutoResponse_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ProdutoResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "limit"
+        ],
+        "title": "PageResponse[ProdutoResponse]"
+      },
+      "PageResponse_UnidadeResponse_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/UnidadeResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "limit"
+        ],
+        "title": "PageResponse[UnidadeResponse]"
+      },
+      "Pedido": {
+        "properties": {
+          "unidadeId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Unidadeid"
+          },
+          "canalPedido": {
+            "$ref": "#/components/schemas/Canal"
+          },
+          "clienteId": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clienteid"
+          },
+          "itens": {
+            "items": {
+              "$ref": "#/components/schemas/Item"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Itens"
+          },
+          "formaPagamento": {
+            "type": "string",
+            "const": "MOCK",
+            "title": "Formapagamento",
+            "default": "MOCK"
+          },
+          "cupom": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 30
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cupom"
+          },
+          "pontosResgate": {
+            "type": "integer",
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Pontosresgate",
+            "default": 0
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "unidadeId",
+          "canalPedido",
+          "itens"
+        ],
+        "title": "Pedido",
+        "example": {
+          "canalPedido": "APP",
+          "formaPagamento": "MOCK",
+          "itens": [
+            {
+              "produtoId": 1,
+              "quantidade": 2
+            }
+          ],
+          "unidadeId": 1
+        }
+      },
+      "PedidoResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "clienteId": {
+            "type": "integer",
+            "title": "Clienteid"
+          },
+          "unidadeId": {
+            "type": "integer",
+            "title": "Unidadeid"
+          },
+          "canalPedido": {
+            "$ref": "#/components/schemas/Canal"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          },
+          "subtotalCentavos": {
+            "type": "integer",
+            "title": "Subtotalcentavos"
+          },
+          "descontoCentavos": {
+            "type": "integer",
+            "title": "Descontocentavos"
+          },
+          "totalCentavos": {
+            "type": "integer",
+            "title": "Totalcentavos"
+          },
+          "pontosResgate": {
+            "type": "integer",
+            "title": "Pontosresgate"
+          },
+          "createdAt": {
+            "type": "string",
+            "title": "Createdat"
+          },
+          "itens": {
+            "items": {
+              "$ref": "#/components/schemas/ItemResponse"
+            },
+            "type": "array",
+            "title": "Itens"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "clienteId",
+          "unidadeId",
+          "canalPedido",
+          "status",
+          "subtotalCentavos",
+          "descontoCentavos",
+          "totalCentavos",
+          "pontosResgate",
+          "createdAt",
+          "itens"
+        ],
+        "title": "PedidoResponse",
+        "example": {
+          "id": 1,
+          "clienteId": 2,
+          "unidadeId": 1,
+          "canalPedido": "TOTEM",
+          "status": "AGUARDANDO_PAGAMENTO",
+          "subtotalCentavos": 5000,
+          "descontoCentavos": 0,
+          "totalCentavos": 5000,
+          "pontosResgate": 0,
+          "createdAt": "2026-10-11T15:00:00+00:00",
+          "itens": [
+            {
+              "produtoId": 1,
+              "nome": "Baião de dois",
+              "quantidade": 2,
+              "precoUnitarioCentavos": 2500
+            }
+          ]
+        }
+      },
+      "Perfil": {
+        "type": "string",
+        "enum": [
+          "CLIENTE",
+          "ATENDENTE",
+          "COZINHA",
+          "GERENTE",
+          "ADMIN"
+        ],
+        "title": "Perfil"
+      },
+      "Produto": {
+        "properties": {
+          "nome": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Nome"
+          },
+          "descricao": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "Descricao",
+            "default": ""
+          },
+          "ativo": {
+            "type": "boolean",
+            "title": "Ativo",
+            "default": true
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "nome"
+        ],
+        "title": "Produto",
+        "example": {
+          "nome": "Baião de dois",
+          "descricao": "Porção individual",
+          "ativo": true
+        }
+      },
+      "ProdutoResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "nome": {
+            "type": "string",
+            "title": "Nome"
+          },
+          "descricao": {
+            "type": "string",
+            "title": "Descricao"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nome",
+          "descricao",
+          "active"
+        ],
+        "title": "ProdutoResponse",
+        "example": {
+          "id": 1,
+          "nome": "Baião de dois",
+          "descricao": "Porção individual",
+          "active": true
+        }
+      },
+      "Status": {
+        "type": "string",
+        "enum": [
+          "AGUARDANDO_PAGAMENTO",
+          "EM_PREPARO",
+          "PRONTO",
+          "ENTREGUE",
+          "CANCELADO"
+        ],
+        "title": "Status"
+      },
+      "Unidade": {
+        "properties": {
+          "nome": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Nome"
+          },
+          "endereco": {
+            "type": "string",
+            "maxLength": 250,
+            "minLength": 5,
+            "title": "Endereco"
+          },
+          "ativo": {
+            "type": "boolean",
+            "title": "Ativo",
+            "default": true
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "nome",
+          "endereco"
+        ],
+        "title": "Unidade",
+        "example": {
+          "nome": "Recife Centro",
+          "endereco": "Rua comercial, 100",
+          "ativo": true
+        }
+      },
+      "UnidadeResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "nome": {
+            "type": "string",
+            "title": "Nome"
+          },
+          "endereco": {
+            "type": "string",
+            "title": "Endereco"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nome",
+          "endereco",
+          "active"
+        ],
+        "title": "UnidadeResponse",
+        "example": {
+          "id": 1,
+          "nome": "Recife Centro",
+          "endereco": "Rua comercial, 100",
+          "active": true
+        }
+      },
+      "UsuarioResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "nome": {
+            "type": "string",
+            "title": "Nome"
+          },
+          "perfil": {
+            "$ref": "#/components/schemas/Perfil"
+          },
+          "unidadeId": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unidadeid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nome",
+          "perfil",
+          "unidadeId"
+        ],
+        "title": "UsuarioResponse",
+        "example": {
+          "id": 2,
+          "nome": "Maria de estudo",
+          "perfil": "CLIENTE",
+          "unidadeId": null
+        }
+      },
+      "Vinculo": {
+        "properties": {
+          "perfil": {
+            "$ref": "#/components/schemas/Perfil"
+          },
+          "unidadeId": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unidadeid"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "perfil"
+        ],
+        "title": "Vinculo",
+        "example": {
+          "perfil": "COZINHA",
+          "unidadeId": 1
+        }
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

@@ -1,0 +1,4 @@
+# Artefatos binários: não aplicar diffs textuais nem conversão de fim de linha.
+*.pdf binary
+*.png binary
+*.zip binary

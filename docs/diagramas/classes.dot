@@ -1,0 +1,15 @@
+digraph Classes {
+ graph [rankdir=LR,bgcolor="white"];node [shape=record,fontname="DejaVu Sans",fontsize=11];edge [fontname="DejaVu Sans",fontsize=10];
+ Usuario [label="{Usuario|id; nome; email; hashSenha\lperfil; unidadeId; ativo\lconsentimento; pontos\l|consentir(); desidentificar()}"];
+ Unidade [label="{Unidade|id; nome; endereco; ativo}"];
+ Produto [label="{Produto|id; nome; descricao; ativo}"];
+ Estoque [label="{Estoque|unidadeId; produtoId\lquantidade; precoCentavos\l|movimentar()}"];
+ Pedido [label="{Pedido|id; clienteId; unidadeId; canalPedido\lstatus; totalCentavos; pontosResgate\l|criar(); transicionar(); cancelar()}"];
+ Item [label="{ItemPedido|produtoId; nomeHistorico\lquantidade; precoUnitarioCentavos}"];
+ Pagamento [label="{Pagamento|pedidoId; status; valorCentavos\lpayloadGateway\l|solicitarMock()}"];
+ Movimento [label="{MovimentoFidelidade|usuarioId; pedidoId; quantidade; motivo}"];
+ Usuario -> Pedido [label="1 : 0..N"];Unidade -> Pedido [label="1 : 0..N"];
+ Unidade -> Estoque [label="1 : 0..N"];Produto -> Estoque [label="1 : 0..N"];
+ Pedido -> Item [label="1 : 1..N"];Produto -> Item [label="1 : 0..N"];
+ Pedido -> Pagamento [label="1 : 0..N"];Usuario -> Movimento [label="1 : 0..N"];
+}

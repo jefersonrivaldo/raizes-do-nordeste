@@ -1,0 +1,15 @@
+{
+  "executadoEm": "2026-10-11T14:51:12.432Z",
+  "ferramenta": "Newman 6.2.1",
+  "requisicoes": {
+    "total": 20,
+    "pending": 0,
+    "failed": 0
+  },
+  "assercoes": {
+    "total": 40,
+    "pending": 0,
+    "failed": 0
+  },
+  "falhas": []
+}

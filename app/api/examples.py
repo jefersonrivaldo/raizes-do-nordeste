@@ -1,0 +1,25 @@
+"""Exemplos fictícios publicados no Swagger, sem credenciais reais."""
+EXAMPLES={
+'Cadastro':{'nome':'Maria de estudo','email':'maria@example.com','senha':'SenhaEstudo123!'},
+'Login':{'email':'maria@example.com','senha':'SenhaEstudo123!'},
+'Unidade':{'nome':'Recife Centro','endereco':'Rua comercial, 100','ativo':True},
+'Produto':{'nome':'Baião de dois','descricao':'Porção individual','ativo':True},
+'Vinculo':{'perfil':'COZINHA','unidadeId':1},
+'Estoque':{'produtoId':1,'quantidade':10,'precoCentavos':2500,'motivo':'Reposição'},
+'Pagamento':{'cenario':'APROVAR'},'MudancaStatus':{'status':'PRONTO'},
+'Consentimento':{'consentimento':True},
+'UsuarioResponse':{'id':2,'nome':'Maria de estudo','perfil':'CLIENTE','unidadeId':None},
+'LoginResponse':{'accessToken':'<JWT emitido no login>','tokenType':'Bearer','expiresIn':3600,'user':{'id':2,'nome':'Maria de estudo','perfil':'CLIENTE','unidadeId':None}},
+'ItemResponse':{'produtoId':1,'nome':'Baião de dois','quantidade':2,'precoUnitarioCentavos':2500},
+'PedidoResponse':{'id':1,'clienteId':2,'unidadeId':1,'canalPedido':'TOTEM','status':'AGUARDANDO_PAGAMENTO','subtotalCentavos':5000,'descontoCentavos':0,'totalCentavos':5000,'pontosResgate':0,'createdAt':'2026-10-11T15:00:00+00:00','itens':[{'produtoId':1,'nome':'Baião de dois','quantidade':2,'precoUnitarioCentavos':2500}]},
+'PagamentoResponse':{'id':1,'pedidoId':1,'status':'APROVADO','valorCentavos':5000,'payload':{'gateway':'MOCK','referencia':'mock-1','status':'APROVADO','valorCentavos':5000,'mensagem':'Pagamento aprovado.'}},
+'UnidadeResponse':{'id':1,'nome':'Recife Centro','endereco':'Rua comercial, 100','active':True},
+'ProdutoResponse':{'id':1,'nome':'Baião de dois','descricao':'Porção individual','active':True},
+'EstoqueResponse':{'produtoId':1,'quantidade':100,'precoCentavos':2500},
+'CardapioResponse':{'produtoId':1,'nome':'Baião de dois','descricao':'Porção individual','precoCentavos':2500,'disponivel':100},
+'ConsentimentoResponse':{'consentimento':True,'versao':'1.0'},
+'FidelidadeResponse':{'saldo':50,'consentimento':True,'consentimentoEm':'2026-10-11T15:00:00+00:00','versao':'1.0','items':[{'pedidoId':1,'quantidade':50,'motivo':'COMPRA','createdAt':'2026-10-11T15:00:00+00:00'}],'page':1,'limit':20},
+'AuditoriaResponse':{'id':1,'actor_id':2,'acao':'PEDIDO_CRIADO','recurso':'1','created_at':'2026-10-11T15:00:00+00:00'},
+'HealthResponse':{'status':'ok','database':'ok'},
+'ErrorResponse':{'error':'ESTOQUE_INSUFICIENTE','message':'Estoque insuficiente na unidade.','details':[],'timestamp':'2026-10-11T15:00:00+00:00','path':'/pedidos','requestId':'00000000-0000-4000-8000-000000000001'}
+}
