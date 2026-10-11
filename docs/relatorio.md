@@ -1,10 +1,14 @@
 # Raízes do Nordeste — relatório técnico de estudo
 
+Autor: Jeferson Rivaldo Santos
+
+RU: 4937546
+
 ## 1. Introdução e objetivos
 
 A rede de lanchonetes precisa integrar unidades com cardápio e estoque próprios, atendendo APP, TOTEM, BALCAO, PICKUP e WEB. Esta implementação acadêmica oferece uma API REST persistente que centraliza pedidos, pagamento simulado, operação da cozinha e fidelização. O canal de origem é obrigatório e consultável, permitindo acompanhamento operacional. O objetivo é fechar o fluxo pedido → pagamento mock → preparo → entrega, com validação de estoque e controle de acesso.
 
-Documento de referência: UNINTER_Roteiro_Back_End_Copia_Adaptada_Estudo.pdf (2026), cópia adaptada para estudo, fornecida pelo usuário. Antes da entrega institucional, conferir o roteiro oficial, preencher identificação acadêmica e adequar a formatação exigida. O relatório registra a implementação técnica; não comprova publicação no GitHub nem substitui revisão pelo estudante.
+Documento de referência: UNINTER_Roteiro_Back_End_Copia_Adaptada_Estudo.pdf (2026), cópia adaptada para estudo, fornecida pelo usuário. Antes da entrega institucional, conferir o roteiro oficial e adequar a formatação exigida. O relatório registra a implementação técnica; não comprova publicação no GitHub nem substitui revisão pelo estudante.
 
 ## 2. Análise e requisitos
 
@@ -98,7 +102,7 @@ Os resultados são evidência da máquina atual e do código correspondente; nov
 
 Código Java, migrations Flyway, scripts de JVM/Maven, pom.xml, seed, .env.example, README, OpenAPI, coleção, plano de testes e diagramas estão no checkout. O PDF técnico é gerado a partir deste relatório e dos diagramas. Repositório pretendido: https://github.com/jefersonrivaldo/raizes-do-nordeste ; o código e os documentos foram enviados à branch main após autorização do proprietário. As URLs de download sem login retornaram HTTP 404 nesta sessão; a visibilidade pública ainda precisa ser verificada. Acesso local ao Swagger usa a rota /docs com API iniciada; não foi realizado deploy público.
 
-O fluxo crítico é implementado com persistência real e operações transacionais. As limitações são explicitadas para separar capacidades demonstradas de evoluções propostas. Para entrega acadêmica, o estudante deve revisar o código/relatório, inserir seus dados de identificação, verificar a versão oficial do roteiro, verificar a visibilidade do repositório e testar os links pelo acesso do avaliador. Histórico mínimo de cinco commits é uma recomendação do roteiro; não foi fabricado nesta implementação.
+O fluxo crítico é implementado com persistência real e operações transacionais. As limitações são explicitadas para separar capacidades demonstradas de evoluções propostas. Para entrega acadêmica, o estudante deve revisar o código/relatório, conferir seus dados de identificação, verificar a versão oficial do roteiro, verificar a visibilidade do repositório e testar os links pelo acesso do avaliador. Histórico mínimo de cinco commits é uma recomendação do roteiro; não foi fabricado nesta implementação.
 
 ## Referências
 
