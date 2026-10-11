@@ -140,6 +140,10 @@ public class RuntimeReadiness {
   }
 
   static void evidence() throws Exception {
+    Files.copy(
+        Path.of("target/evidencias-colecao-java.json"),
+        Path.of("docs/evidencias-colecao-java.json"),
+        StandardCopyOption.REPLACE_EXISTING);
     var factory = DocumentBuilderFactory.newInstance();
     factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
     for (String name : List.of("ApiIntegrationTest", "CollectionContractTest")) {
@@ -160,6 +164,8 @@ public class RuntimeReadiness {
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
       transformer.transform(
           new DOMSource(document), new StreamResult("docs/evidencias-junit-" + output + ".xml"));
+      Path report = Path.of("docs/evidencias-junit-" + output + ".xml");
+      Files.writeString(report, Files.readString(report).replaceAll("(?m)[ \\t]+$", ""));
     }
   }
 }

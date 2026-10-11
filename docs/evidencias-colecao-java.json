@@ -1,7 +1,7 @@
 {
-  "executor" : "Java 21 / JUnit 5 / HttpClient",
-  "falhas" : 0,
-  "executadoEm" : "2026-10-11T15:17:05.074355089Z",
+  "executadoEm" : "2026-10-11T15:25:15.955077448Z",
   "gruposDeAssercoes" : 40,
-  "requisicoes" : 20
+  "requisicoes" : 20,
+  "executor" : "Java 21 / JUnit 5 / HttpClient",
+  "falhas" : 0
 }

@@ -2,3 +2,6 @@
 *.pdf binary
 *.png binary
 *.zip binary
+
+# Scripts auxiliares do ambiente ficam fora da estatística de linguagens do GitHub.
+*.sh linguist-detectable=false
