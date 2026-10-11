@@ -1,0 +1,12 @@
+.env
+.venv/
+__pycache__/
+.pytest_cache/
+target/
+data/
+*.log
+.idea/
+*.iml
+.vscode/
+
+.m2/

@@ -1,0 +1,28 @@
+digraph ER { graph [rankdir=TB,bgcolor="white"];node [shape=record,fontname="DejaVu Sans",fontsize=10];edge [fontname="DejaVu Sans",fontsize=9];
+units [label="{units|id : BIGINT PK\lnome : VARCHAR(120) NOT NULL\lendereco : VARCHAR(250) NOT NULL\lactive : BOOLEAN NOT NULL\l}"];
+users [label="{users|id : BIGINT PK\lnome : VARCHAR(120) NOT NULL\lemail : VARCHAR(254) NOT NULL\lpassword_hash : VARCHAR(255) NOT NULL\lperfil : VARCHAR(20) NOT NULL\lunidade_id : BIGINT FK\lactive : BOOLEAN NOT NULL\lconsent : BOOLEAN NOT NULL\lconsent_at : VARCHAR(50)\lconsent_version : VARCHAR(10)\lpoints : BIGINT NOT NULL\lcreated_at : VARCHAR(50) NOT NULL\l}"];
+products [label="{products|id : BIGINT PK\lnome : VARCHAR(120) NOT NULL\ldescricao : VARCHAR(500) NOT NULL\lactive : BOOLEAN NOT NULL\l}"];
+stocks [label="{stocks|unidade_id : BIGINT PK FK NOT NULL\lproduto_id : BIGINT PK FK NOT NULL\lquantidade : BIGINT NOT NULL\lpreco_centavos : BIGINT NOT NULL\l}"];
+orders [label="{orders|id : BIGINT PK\lcliente_id : BIGINT FK NOT NULL\lunidade_id : BIGINT FK NOT NULL\lcanal_pedido : VARCHAR(20) NOT NULL\lstatus : VARCHAR(30) NOT NULL\lsubtotal_centavos : BIGINT NOT NULL\ldesconto_centavos : BIGINT NOT NULL\ltotal_centavos : BIGINT NOT NULL\lpontos_resgate : BIGINT NOT NULL\lpontos_concedidos : BIGINT NOT NULL\lcreated_at : VARCHAR(50) NOT NULL\lupdated_at : VARCHAR(50) NOT NULL\l}"];
+order_items [label="{order_items|id : BIGINT PK\lpedido_id : BIGINT FK NOT NULL\lproduto_id : BIGINT FK NOT NULL\lnome_produto : VARCHAR(120) NOT NULL\lquantidade : BIGINT NOT NULL\lpreco_centavos : BIGINT NOT NULL\l}"];
+payments [label="{payments|id : BIGINT PK\lpedido_id : BIGINT FK NOT NULL\lstatus : VARCHAR(20) NOT NULL\lvalor_centavos : BIGINT NOT NULL\lprovider_payload : TEXT NOT NULL\lcreated_at : VARCHAR(50) NOT NULL\l}"];
+stock_movements [label="{stock_movements|id : BIGINT PK\lunidade_id : BIGINT FK NOT NULL\lproduto_id : BIGINT FK NOT NULL\lquantidade : BIGINT NOT NULL\lmotivo : VARCHAR(120) NOT NULL\lpedido_id : BIGINT FK\lactor_id : BIGINT FK NOT NULL\lcreated_at : VARCHAR(50) NOT NULL\l}"];
+loyalty_movements [label="{loyalty_movements|id : BIGINT PK\luser_id : BIGINT FK NOT NULL\lpedido_id : BIGINT FK\lquantidade : BIGINT NOT NULL\lmotivo : VARCHAR(120) NOT NULL\lcreated_at : VARCHAR(50) NOT NULL\l}"];
+audit [label="{audit|id : BIGINT PK\lactor_id : BIGINT FK NOT NULL\lacao : VARCHAR(80) NOT NULL\lrecurso : VARCHAR(100) NOT NULL\lcreated_at : VARCHAR(50) NOT NULL\l}"];
+idempotency [label="{idempotency|actor_id : BIGINT PK FK NOT NULL\loperacao : VARCHAR(30) PK NOT NULL\lchave : VARCHAR(100) PK NOT NULL\lfingerprint : VARCHAR(64) NOT NULL\lrecurso_id : BIGINT NOT NULL\l}"];
+users -> units [label="unidade_id -> id (N:1)"];
+stocks -> units [label="unidade_id -> id (N:1)"];
+stocks -> products [label="produto_id -> id (N:1)"];
+orders -> users [label="cliente_id -> id (N:1)"];
+orders -> units [label="unidade_id -> id (N:1)"];
+order_items -> orders [label="pedido_id -> id (N:1)"];
+order_items -> products [label="produto_id -> id (N:1)"];
+payments -> orders [label="pedido_id -> id (N:1)"];
+stock_movements -> orders [label="pedido_id -> id (N:1)"];
+stock_movements -> users [label="actor_id -> id (N:1)"];
+stock_movements -> stocks [label="unidade_id,produto_id (N:1)"];
+loyalty_movements -> users [label="user_id -> id (N:1)"];
+loyalty_movements -> orders [label="pedido_id -> id (N:1)"];
+audit -> users [label="actor_id -> id (N:1)"];
+idempotency -> users [label="actor_id -> id (N:1)"];
+}

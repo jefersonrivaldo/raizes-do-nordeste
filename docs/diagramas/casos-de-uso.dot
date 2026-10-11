@@ -1,0 +1,25 @@
+digraph UC {
+ graph [rankdir=LR,bgcolor="white"]; node [fontname="DejaVu Sans",fontsize=12];
+ cliente [shape=box,label="Cliente\nAPP / WEB / TOTEM / PICKUP"];
+ atendente [shape=box,label="Atendente / BALCAO"];
+ cozinha [shape=box,label="Cozinha"];
+ gerente [shape=box,label="Gerente / Administrador"];
+ gateway [shape=box,label="Gateway externo simulado"];
+ subgraph cluster_api {label="API Raízes do Nordeste";
+ node [shape=ellipse]; cadastro [label="Cadastrar e autenticar"];
+ cardapio [label="Consultar cardápio por unidade"];
+ pedido [label="Realizar pedido multicanal"];
+ pagar [label="Solicitar pagamento mock"];
+ status [label="Atualizar status / cancelar"];
+ estoque [label="Gerenciar estoque por unidade"];
+ fidelidade [label="Consentir / consultar / resgatar pontos"];
+ gestao [label="Gerenciar unidades, produtos e perfis"];
+ privacidade [label="Desidentificar conta própria"];
+ auditoria [label="Consultar auditoria (ADMIN)"];
+ }
+ cliente -> cadastro;cliente -> cardapio;cliente -> pedido;cliente -> pagar;cliente -> fidelidade;cliente -> privacidade;cliente -> status;
+ atendente -> pedido;atendente -> status;atendente -> pagar;cozinha -> status;
+ gerente -> estoque;gerente -> gestao;gerente -> status;gerente -> auditoria;
+ pagar -> gateway [dir=both];pedido -> estoque [style=dashed,label="valida e baixa"];
+ pedido -> fidelidade [style=dashed,label="resgate opcional"];
+}

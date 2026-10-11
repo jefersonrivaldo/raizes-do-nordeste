@@ -1,0 +1,782 @@
+{
+  "info": {
+    "name": "Raízes do Nordeste — fluxo e erros",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Execute em ordem. Configure adminPassword em ambiente local. Dados são fictícios; pagamento exclusivamente mock."
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "adminPassword",
+      "value": ""
+    },
+    {
+      "key": "clientPassword",
+      "value": "ClienteEstudo123!"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (pm.info.requestName.startsWith(\"T01 \")) {",
+          "  const id = pm.variables.replaceIn(\"{{$guid}}\");",
+          "  pm.collectionVariables.set(\"runId\", id);",
+          "  pm.collectionVariables.set(\"clientEmail\", \"cliente-\" + id + \"@example.com\");",
+          "}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "T01 Cadastro de cliente",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/usuarios",
+        "description": "API iniciada; email novo gerado automaticamente; resultado esperado HTTP 201",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Cliente de teste\",\n  \"email\": \"{{clientEmail}}\",\n  \"senha\": \"{{clientPassword}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "const j = pm.response.json();",
+              "pm.test(\"perfil CLIENTE\", () => pm.expect(j.perfil).to.eql(\"CLIENTE\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "T02 Login cliente",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "description": "Fluxo anterior concluído; resultado esperado HTTP 200",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{clientEmail}}\",\n  \"senha\": \"{{clientPassword}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const j = pm.response.json();",
+              "pm.test(\"JWT emitido\", () => pm.expect(j.accessToken).to.be.a(\"string\"));",
+              "pm.collectionVariables.set(\"token\", j.accessToken);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "T03 Login administrador",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "description": "Seed aplicado; variável adminPassword informada localmente; resultado esperado HTTP 200",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@raizes.local\",\n  \"senha\": \"{{adminPassword}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const j = pm.response.json();",
+              "pm.test(\"perfil ADMIN\", () => pm.expect(j.user.perfil).to.eql(\"ADMIN\"));",
+              "pm.collectionVariables.set(\"adminToken\", j.accessToken);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "T04 Cardápio por unidade",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/unidades/1/cardapio",
+        "description": "Fluxo anterior concluído; resultado esperado HTTP 200"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const j = pm.response.json();",
+              "pm.test(\"produto e preço\", () => {pm.expect(j.items[0].produtoId).to.eql(1);pm.expect(j.items[0].precoCentavos).to.eql(2500);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "T05 Consentimento fidelidade",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/fidelidade/consentimento",
+        "description": "Fluxo anterior concluído; resultado esperado HTTP 200",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"consentimento\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const j = pm.response.json();",
+              "pm.test(\"consentimento registrado\", () => pm.expect(j.consentimento).to.eql(true));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "T06 Criar pedido multicanal",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Idempotency-Key",
+            "value": "{{runId}}-pedido"
+          }
+        ],
+        "url": "{{baseUrl}}/pedidos",
+        "description": "Fluxo anterior concluído; resultado esperado HTTP 201",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"unidadeId\": 1,\n  \"canalPedido\": \"TOTEM\",\n  \"itens\": [\n    {\n      \"produtoId\": 1,\n      \"quantidade\": 2\n    }\n  ],\n  \"formaPagamento\": \"MOCK\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "const j = pm.response.json();",
+              "pm.test(\"pedido aguarda pagamento\", () => {pm.expect(j.status).to.eql(\"AGUARDANDO_PAGAMENTO\");pm.expect(j.totalCentavos).to.eql(5000);pm.expect(j.canalPedido).to.eql(\"TOTEM\");});",
+              "pm.collectionVariables.set(\"pedidoId\", j.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "T07 Idempotência pedido",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Idempotency-Key",
+            "value": "{{runId}}-pedido"
+          }
+        ],
+        "url": "{{baseUrl}}/pedidos",
+        "description": "Fluxo anterior concluído; resultado esperado HTTP 201",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"unidadeId\": 1,\n  \"canalPedido\": \"TOTEM\",\n  \"itens\": [\n    {\n      \"produtoId\": 1,\n      \"quantidade\": 2\n    }\n  ],\n  \"formaPagamento\": \"MOCK\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "const j = pm.response.json();",
+              "pm.test(\"mesmo pedido\", () => pm.expect(j.id).to.eql(Number(pm.collectionVariables.get(\"pedidoId\"))));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "T08 Pagamento negado",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Idempotency-Key",
+            "value": "{{runId}}-negado"
+          }
+        ],
+        "url": "{{baseUrl}}/pedidos/{{pedidoId}}/pagamentos",
+        "description": "Fluxo anterior concluído; resultado esperado HTTP 201",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"cenario\": \"NEGAR\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "const j = pm.response.json();",
+              "pm.test(\"gateway negou sem aprovar pedido\", () => pm.expect(j.status).to.eql(\"NEGADO\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "T09 Pagamento aprovado em nova tentativa",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Idempotency-Key",
+            "value": "{{runId}}-aprovado"
+          }
+        ],
+        "url": "{{baseUrl}}/pedidos/{{pedidoId}}/pagamentos",
+        "description": "Fluxo anterior concluído; resultado esperado HTTP 201",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"cenario\": \"APROVAR\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "const j = pm.response.json();",
+              "pm.test(\"gateway aprovou\", () => pm.expect(j.status).to.eql(\"APROVADO\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "T10 Cozinha concluiu preparo",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/pedidos/{{pedidoId}}/status",
+        "description": "Fluxo anterior concluído; resultado esperado HTTP 200",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"PRONTO\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const j = pm.response.json();",
+              "pm.test(\"pronto\", () => pm.expect(j.status).to.eql(\"PRONTO\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "T11 Entrega e fidelização",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/pedidos/{{pedidoId}}/status",
+        "description": "Fluxo anterior concluído; resultado esperado HTTP 200",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"ENTREGUE\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const j = pm.response.json();",
+              "pm.test(\"entregue\", () => pm.expect(j.status).to.eql(\"ENTREGUE\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "T12 Saldo fidelidade",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/fidelidade",
+        "description": "Fluxo anterior concluído; resultado esperado HTTP 200"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const j = pm.response.json();",
+              "pm.test(\"50 pontos creditados\", () => pm.expect(j.saldo).to.eql(50));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "T13 Filtro canalPedido",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/pedidos?canalPedido=TOTEM&status=ENTREGUE&page=1&limit=20",
+        "description": "Fluxo anterior concluído; resultado esperado HTTP 200"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const j = pm.response.json();",
+              "pm.test(\"pedido filtrado\", () => pm.expect(j.items.some(x => x.id === Number(pm.collectionVariables.get(\"pedidoId\")) && x.canalPedido === \"TOTEM\")).to.eql(true));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "T14 Sem autenticação",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/pedidos",
+        "description": "Omitir Authorization; resultado esperado HTTP 401"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));",
+              "const j = pm.response.json();",
+              "pm.test(\"erro padronizado\", () => pm.expect(j).to.have.all.keys(\"error\",\"message\",\"details\",\"timestamp\",\"path\",\"requestId\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "T15 Perfil sem permissão",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/unidades",
+        "description": "Fluxo anterior concluído; resultado esperado HTTP 403",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Unidade teste\",\n  \"endereco\": \"Rua teste, 123\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+              "const j = pm.response.json();",
+              "pm.test(\"erro padronizado\", () => pm.expect(j).to.have.all.keys(\"error\",\"message\",\"details\",\"timestamp\",\"path\",\"requestId\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "T16 Canal obrigatório ausente",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Idempotency-Key",
+            "value": "{{runId}}-sem-canal"
+          }
+        ],
+        "url": "{{baseUrl}}/pedidos",
+        "description": "Fluxo anterior concluído; resultado esperado HTTP 422",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"unidadeId\": 1,\n  \"itens\": [\n    {\n      \"produtoId\": 1,\n      \"quantidade\": 2\n    }\n  ],\n  \"formaPagamento\": \"MOCK\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 422\", () => pm.response.to.have.status(422));",
+              "const j = pm.response.json();",
+              "pm.test(\"erro padronizado\", () => pm.expect(j).to.have.all.keys(\"error\",\"message\",\"details\",\"timestamp\",\"path\",\"requestId\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "T17 Canal inválido",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Idempotency-Key",
+            "value": "{{runId}}-canal-invalido"
+          }
+        ],
+        "url": "{{baseUrl}}/pedidos",
+        "description": "Fluxo anterior concluído; resultado esperado HTTP 422",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"unidadeId\": 1,\n  \"canalPedido\": \"OUTRO\",\n  \"itens\": [\n    {\n      \"produtoId\": 1,\n      \"quantidade\": 2\n    }\n  ],\n  \"formaPagamento\": \"MOCK\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 422\", () => pm.response.to.have.status(422));",
+              "const j = pm.response.json();",
+              "pm.test(\"erro padronizado\", () => pm.expect(j).to.have.all.keys(\"error\",\"message\",\"details\",\"timestamp\",\"path\",\"requestId\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "T18 Estoque insuficiente",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Idempotency-Key",
+            "value": "{{runId}}-sem-estoque"
+          }
+        ],
+        "url": "{{baseUrl}}/pedidos",
+        "description": "Seed com saldo de 100; não adicionar estoque antes deste teste; resultado esperado HTTP 409",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"unidadeId\": 1,\n  \"canalPedido\": \"TOTEM\",\n  \"itens\": [\n    {\n      \"produtoId\": 1,\n      \"quantidade\": 1000\n    }\n  ],\n  \"formaPagamento\": \"MOCK\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+              "const j = pm.response.json();",
+              "pm.test(\"erro padronizado\", () => pm.expect(j).to.have.all.keys(\"error\",\"message\",\"details\",\"timestamp\",\"path\",\"requestId\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "T19 Pedido inexistente",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/pedidos/999999999",
+        "description": "Fluxo anterior concluído; resultado esperado HTTP 404"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));",
+              "const j = pm.response.json();",
+              "pm.test(\"erro padronizado\", () => pm.expect(j).to.have.all.keys(\"error\",\"message\",\"details\",\"timestamp\",\"path\",\"requestId\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "T20 Transição inválida",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/pedidos/{{pedidoId}}/status",
+        "description": "Fluxo anterior concluído; resultado esperado HTTP 409",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"PRONTO\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+              "const j = pm.response.json();",
+              "pm.test(\"erro padronizado\", () => pm.expect(j).to.have.all.keys(\"error\",\"message\",\"details\",\"timestamp\",\"path\",\"requestId\"));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+digraph Arquitetura {
+ graph [rankdir=TB,bgcolor="white"]; node [shape=box,fontname="DejaVu Sans",fontsize=12,style="rounded,filled",fillcolor="#f0f7ed"];
+ canais [label="APP / TOTEM / BALCAO / PICKUP / WEB"];
+ api [label="API: Spring Boot / Bean Validation\nRotas, JWT, perfis e contratos"];
+ application [label="Application: serviços de casos de uso\nPedidos, pagamento, status e fidelidade"];
+ domain [label="Domain: regras puras\nCanal, perfil, status, transições, descontos"];
+ infra [label="Infrastructure\nH2, migrations, hash, JWT, gateway mock"];
+ db [shape=cylinder,label="H2 persistente"];
+ gateway [label="Gateway MOCK (sem rede externa)"];
+ canais -> api;api -> application;application -> domain;application -> infra;infra -> db;infra -> gateway;
+}

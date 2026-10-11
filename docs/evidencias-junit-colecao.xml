@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" errors="0" failures="0" name="br.com.raizes.CollectionContractTest" skipped="0" tests="1" time="2.074" version="3.0.2" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd">
+      
+  
+    <testcase classname="br.com.raizes.CollectionContractTest" name="collectionInteiraComResultadosEsperados" time="2.066">
+    
+  </testcase>
+    
+</testsuite>
