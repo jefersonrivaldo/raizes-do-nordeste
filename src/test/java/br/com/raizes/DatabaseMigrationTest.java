@@ -15,7 +15,8 @@ class DatabaseMigrationTest {
   void reabrirBancoPersistentePreservaDadosENaoReaplicaMigracao() throws Exception {
     String url = "jdbc:h2:file:" + directory.resolve("migration").toAbsolutePath()
         + ";DB_CLOSE_ON_EXIT=FALSE";
-    Flyway first = Flyway.configure().dataSource(url, "sa", "").load();
+    // Simula um banco já existente na versão anterior, antes da atualização.
+    Flyway first = Flyway.configure().dataSource(url, "sa", "").target("1").load();
     assertEquals(1, first.migrate().migrationsExecuted);
     try (var connection = DriverManager.getConnection(url, "sa", "");
         var statement = connection.createStatement()) {
@@ -23,6 +24,8 @@ class DatabaseMigrationTest {
     }
     // Fechar a conexão e criar outra instância Flyway testa o arquivo existente.
     Flyway reopened = Flyway.configure().dataSource(url, "sa", "").load();
+    // migrate valida os checksums já aplicados e instala a V2 pendente.
+    assertEquals(1, reopened.migrate().migrationsExecuted);
     reopened.validate();
     assertEquals(0, reopened.migrate().migrationsExecuted);
     try (var connection = DriverManager.getConnection(url, "sa", "");
@@ -31,6 +34,13 @@ class DatabaseMigrationTest {
       assertTrue(rows.next());
       assertEquals("Unidade preservada", rows.getString(1));
       assertFalse(rows.next());
+    }
+    try (var connection = DriverManager.getConnection(url, "sa", "");
+        var statement = connection.createStatement();
+        var rows = statement.executeQuery(
+            "SELECT COUNT(*) FROM INFORMATION_SCHEMA.INDEXES WHERE INDEX_NAME='IDX_ORDERS_EXPIRATION'")) {
+      assertTrue(rows.next());
+      assertEquals(1, rows.getInt(1));
     }
   }
 }

@@ -7,12 +7,25 @@ import java.net.http.*;
 import java.nio.file.*;
 import java.util.*;
 import java.util.regex.*;
-import org.apache.pdfbox.pdmodel.*;
 
-/** Geração de contratos, DER e PDF inteiramente em Java. Execute após iniciar a API. */
+/** Geração de contratos, DER e PDF em Java; --api-only gera apenas os contratos. */
 public class Documentation {
   static ObjectMapper json = new ObjectMapper();
   static JsonNode schemas;
+
+  record Options(String base, boolean apiOnly) {}
+
+  static Options options(String[] args) {
+    String base = null;
+    boolean apiOnly = false;
+    for (String arg : args) {
+      if (arg.equals("--api-only")) apiOnly = true;
+      else if (arg.startsWith("--") || base != null)
+        throw new IllegalArgumentException("Uso: Documentation [URL-base] [--api-only]");
+      else base = arg;
+    }
+    return new Options(base == null ? "http://127.0.0.1:8000" : base, apiOnly);
+  }
 
   static JsonNode example(JsonNode s) {
     if (s.has("$ref"))
@@ -36,17 +49,33 @@ public class Documentation {
   }
 
   public static void main(String[] args) throws Exception {
-    String base = args.length == 0 ? "http://127.0.0.1:8000" : args[0];
+    var options = options(args);
+    contracts(options, Path.of("docs"));
+    if (options.apiOnly()) {
+      System.out.println("Contratos OpenAPI e Markdown gerados em Java.");
+      return;
+    }
+    diagram();
+    pdf();
+    System.out.println("Contratos, DER e relatório PDF gerados em Java.");
+  }
+
+  static void contracts(Options options, Path docs) throws Exception {
+    if (!options.apiOnly() && !Files.isRegularFile(docs.resolve("relatorio.md")))
+      throw new IllegalStateException(
+          "Relatório obrigatório ausente: "
+              + docs.resolve("relatorio.md")
+              + ". Use --api-only para gerar somente os contratos da API.");
     var response =
         HttpClient.newHttpClient()
             .send(
-                HttpRequest.newBuilder(URI.create(base + "/openapi.json")).GET().build(),
+                HttpRequest.newBuilder(URI.create(options.base() + "/openapi.json")).GET().build(),
                 HttpResponse.BodyHandlers.ofString());
     if (response.statusCode() != 200) throw new IllegalStateException("API/OpenAPI indisponível");
     var api = json.readTree(response.body());
     schemas = api.get("components").get("schemas");
     Files.writeString(
-        Path.of("docs/openapi.json"),
+        docs.resolve("openapi.json"),
         json.writerWithDefaultPrettyPrinter().writeValueAsString(api) + "\n");
     var text =
         new StringBuilder(
@@ -119,10 +148,15 @@ public class Documentation {
                                   });
                           text.append(
                               "\n"
-                                  + "Erros: 401 autenticação, 403 autorização, 404 inexistente, 409"
-                                  + " regra/integridade, 422 validação, 503 banco ocupado; JSON"
+                                  + "Erros: 401 autenticação, 403 autorização, 404 inexistente, 405"
+                                  + " método HTTP, 406 representação, 409 regra/integridade, 415 tipo"
+                                  + " de conteúdo, 422 validação, 503 banco ocupado; JSON"
                                   + " ErrorResponse uniforme. Nem todos os erros se aplicam a toda"
                                   + " rota.\n\n");
+                          if (op.path("responses").has("429"))
+                            text.append(
+                                "Limite de tentativas: HTTP 429 com Retry-After indicando os segundos"
+                                    + " até uma nova tentativa.\n\n");
                         }));
     text.append(
         "## Padrão de erro\n\n"
@@ -131,11 +165,10 @@ public class Documentation {
             + " unidade.\",\"details\":[],\"timestamp\":\"2026-10-11T15:00:00Z\",\"path\":\"/pedidos\",\"requestId\":\"uuid\"}\n"
             + "```\n\n"
             + "HTTP 201 em pagamento significa tentativa persistida; examine status"
-            + " APROVADO/NEGADO/ERRO. Erros de validação omitem os valores enviados.\n");
-    Files.writeString(Path.of("docs/api.md"), text);
-    diagram();
-    pdf();
-    System.out.println("Contratos, DER e relatório PDF gerados em Java.");
+            + " APROVADO/NEGADO/ERRO. O campo status representa o estado atual e pode mudar para"
+            + " ESTORNADO após cancelamento. payload preserva a resposta original do gateway mock,"
+            + " mesmo após o estorno. Erros de validação omitem os valores enviados.\n");
+    Files.writeString(docs.resolve("api.md"), text);
   }
 
   static void appendExample(StringBuilder out, JsonNode node) {

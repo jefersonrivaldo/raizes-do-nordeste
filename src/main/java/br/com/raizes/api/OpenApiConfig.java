@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.models.headers.Header;
 import io.swagger.v3.oas.models.media.*;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
@@ -52,29 +53,45 @@ public class OpenApiConfig {
                                 publicRoute
                                     ? List.of()
                                     : List.of(new SecurityRequirement().addList("bearerAuth")));
-                            for (int code : new int[] {401, 403, 404, 409, 422, 503})
+                            List<Integer> errors =
+                                new ArrayList<>(List.of(401, 403, 404, 405, 406, 409, 415, 422, 503));
+                            if (method.name().equals("POST")
+                                && (path.equals("/auth/login") || path.equals("/usuarios")))
+                              errors.add(429);
+                            for (int code : errors) {
+                              var response =
+                                  new ApiResponse()
+                                      .description(
+                                          switch (code) {
+                                            case 401 -> "Token ausente/inválido";
+                                            case 403 -> "Sem permissão";
+                                            case 404 -> "Recurso não encontrado";
+                                            case 405 -> "Método HTTP não permitido";
+                                            case 406 -> "Representação não aceitável";
+                                            case 409 -> "Conflito/regra de negócio";
+                                            case 415 -> "Tipo de conteúdo não suportado";
+                                            case 422 -> "Validação";
+                                            case 429 -> "Limite de tentativas excedido";
+                                            default -> "Banco ocupado";
+                                          })
+                                      .content(
+                                          new Content()
+                                              .addMediaType(
+                                                  "application/json",
+                                                  new MediaType()
+                                                      .schema(
+                                                          new Schema<>()
+                                                              .$ref(
+                                                                  "#/components/schemas/ErrorResponse"))));
+                              if (code == 429)
+                                response.addHeaderObject(
+                                    "Retry-After",
+                                    new Header()
+                                        .description("Segundos até uma nova tentativa ser permitida")
+                                        .schema(new IntegerSchema()));
                               op.getResponses()
-                                  .addApiResponse(
-                                      Integer.toString(code),
-                                      new ApiResponse()
-                                          .description(
-                                              switch (code) {
-                                                case 401 -> "Token ausente/inválido";
-                                                case 403 -> "Sem permissão";
-                                                case 404 -> "Recurso não encontrado";
-                                                case 409 -> "Conflito/regra de negócio";
-                                                case 422 -> "Validação";
-                                                default -> "Banco ocupado";
-                                              })
-                                          .content(
-                                              new Content()
-                                                  .addMediaType(
-                                                      "application/json",
-                                                      new MediaType()
-                                                          .schema(
-                                                              new Schema<>()
-                                                                  .$ref(
-                                                                      "#/components/schemas/ErrorResponse")))));
+                                  .addApiResponse(Integer.toString(code), response);
+                            }
                           }));
       Map<String, Object> request =
           Map.of(
@@ -105,6 +122,35 @@ public class OpenApiConfig {
             .getSchemas()
             .get("Login")
             .setExample(Map.of("email", "maria@example.com", "senha", "SenhaEstudo123!"));
+      Map<String, Object> clientProfile = new LinkedHashMap<>();
+      clientProfile.put("perfil", "CLIENTE");
+      clientProfile.put("unidadeId", null);
+      var profileSchema = api.getComponents().getSchemas().get("Vinculo");
+      if (profileSchema != null) {
+        profileSchema.setExample(clientProfile);
+        profileSchema.setDescription(
+            "ATENDENTE, COZINHA e GERENTE exigem unidadeId; CLIENTE e ADMIN exigem unidadeId null.");
+      }
+      var userSchema = api.getComponents().getSchemas().get("UserResponse");
+      if (userSchema != null) {
+        Map<String, Object> client = new LinkedHashMap<>();
+        client.put("id", 2);
+        client.put("nome", "Maria de estudo");
+        client.putAll(clientProfile);
+        userSchema.setExample(client);
+      }
+      Schema<?> paymentSchema = api.getComponents().getSchemas().get("PaymentResponse");
+      if (paymentSchema != null) {
+        paymentSchema
+            .getProperties()
+            .get("status")
+            .setDescription("Estado atual da tentativa de pagamento, inclusive ESTORNADO.");
+        paymentSchema
+            .getProperties()
+            .get("payload")
+            .setDescription(
+                "Resposta original do gateway mock; preservada quando o status muda para ESTORNADO.");
+      }
     };
   }
 }

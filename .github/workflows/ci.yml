@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Java 21 / Maven 3.9
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Java 21 and Maven cache
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Check Maven version
+        shell: bash
+        run: |
+          mvn --batch-mode -Dstyle.color=never --version
+          maven_version="$(mvn --batch-mode -Dstyle.color=never --version | awk '/Apache Maven/ {print $3}')"
+          if [[ "$maven_version" != 3.9.* ]]; then
+            echo "Expected Maven 3.9.x; runner provides $maven_version" >&2
+            exit 1
+          fi
+
+      - name: Build and test
+        run: mvn --batch-mode --strict-checksums verify
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: surefire-reports
+          path: target/surefire-reports/
+          if-no-files-found: warn
+          retention-days: 14

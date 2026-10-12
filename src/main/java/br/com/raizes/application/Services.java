@@ -13,9 +13,14 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.LongStream;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Service
 @Transactional
@@ -31,14 +36,26 @@ public class Services {
   private final MockGateway gateway;
   private final ObjectMapper json;
   private final String dummyHash;
+  private final long reservationTtlSeconds;
+  private final TransactionTemplate transactions;
 
   public Services(
-      Store db, PasswordEncoder encoder, JwtService jwt, MockGateway gateway, ObjectMapper json) {
+      Store db,
+      PasswordEncoder encoder,
+      JwtService jwt,
+      MockGateway gateway,
+      ObjectMapper json,
+      PlatformTransactionManager transactionManager,
+      @Value("${app.order-reservation-ttl-seconds:1800}") long reservationTtlSeconds) {
+    if (reservationTtlSeconds <= 0)
+      throw new IllegalArgumentException("Prazo da reserva de pedido deve ser positivo.");
     this.db = db;
     this.encoder = encoder;
     this.jwt = jwt;
     this.gateway = gateway;
     this.json = json;
+    this.reservationTtlSeconds = reservationTtlSeconds;
+    this.transactions = new TransactionTemplate(transactionManager);
     dummyHash = encoder.encode("not-a-user-password");
   }
 
@@ -402,16 +419,22 @@ public class Services {
             .jdbc()
             .queryForList("SELECT * FROM order_items WHERE pedido_id=? ORDER BY id", id)
             .stream()
-            .map(
-                i ->
-                    new ItemResponse(
-                        number(i, "produto_id"),
-                        text(i, "nome_produto"),
-                        number(i, "quantidade"),
-                        number(i, "preco_centavos")))
+            .map(this::orderItem)
             .toList();
+    return orderResponse(r, items);
+  }
+
+  private ItemResponse orderItem(Map<String, Object> item) {
+    return new ItemResponse(
+        number(item, "produto_id"),
+        text(item, "nome_produto"),
+        number(item, "quantidade"),
+        number(item, "preco_centavos"));
+  }
+
+  private OrderResponse orderResponse(Map<String, Object> r, List<ItemResponse> items) {
     return new OrderResponse(
-        id,
+        number(r, "id"),
         number(r, "cliente_id"),
         number(r, "unidade_id"),
         Canal.valueOf(text(r, "canal_pedido")),
@@ -425,7 +448,11 @@ public class Services {
   }
 
   public OrderResponse createOrder(Actor actor, Pedido data, String key) {
-    db.lock("users", actor.id());
+    long customer = data.clienteId() == null ? actor.id() : data.clienteId();
+    if (actor.perfil() == Perfil.CLIENTE)
+      require(customer == actor.id(), "SEM_PERMISSAO", "Cliente só cria pedidos próprios.", 403);
+    else unitAccess(actor, data.unidadeId());
+    lockUsers(actor.id(), customer);
     String digest = fingerprint(data);
     Long old = replay(actor, "PEDIDO", key, digest);
     if (old != null) {
@@ -434,11 +461,7 @@ public class Services {
     }
     require(
         bool(db.get("units", data.unidadeId()), "active"), "UNIDADE_INATIVA", "Unidade inativa.");
-    long customer = data.clienteId() == null ? actor.id() : data.clienteId();
-    if (actor.perfil() == Perfil.CLIENTE)
-      require(customer == actor.id(), "SEM_PERMISSAO", "Cliente só cria pedidos próprios.", 403);
-    else unitAccess(actor, data.unidadeId());
-    var user = db.lock("users", customer);
+    var user = db.get("users", customer);
     require(
         text(user, "perfil").equals("CLIENTE") && bool(user, "active"),
         "CLIENTE_INVALIDO",
@@ -544,10 +567,25 @@ public class Services {
     var rows =
         db.jdbc()
             .queryForList(
-                "SELECT id FROM orders" + where + " ORDER BY id DESC LIMIT ? OFFSET ?",
+                "SELECT * FROM orders" + where + " ORDER BY id DESC LIMIT ? OFFSET ?",
                 args.toArray());
+    Map<Long, List<ItemResponse>> itemsByOrder = new HashMap<>();
+    if (!rows.isEmpty()) {
+      var ids = rows.stream().map(r -> number(r, "id")).toArray();
+      String placeholders = String.join(",", Collections.nCopies(ids.length, "?"));
+      for (var item : db.jdbc().queryForList(
+          "SELECT * FROM order_items WHERE pedido_id IN (" + placeholders + ") ORDER BY id", ids)) {
+        itemsByOrder.computeIfAbsent(number(item, "pedido_id"), ignored -> new ArrayList<>())
+            .add(orderItem(item));
+      }
+    }
     audit(actor.id(), "PEDIDOS_CONSULTADOS", actor.id());
-    return new PageResponse<>(rows.stream().map(r -> order(number(r, "id"))).toList(), page, limit);
+    return new PageResponse<>(
+        rows.stream()
+            .map(r -> orderResponse(r, itemsByOrder.getOrDefault(number(r, "id"), List.of())))
+            .toList(),
+        page,
+        limit);
   }
 
   private PaymentResponse payment(Map<String, Object> row) {
@@ -565,13 +603,84 @@ public class Services {
     }
   }
 
-  public PaymentResponse pay(Actor actor, long id, Scenario scenario, String key) {
-    db.lock("users", actor.id());
+  private void lockUsers(long... ids) {
+    // Every order mutation locks users in the same order, before the order and its stock rows.
+    LongStream.of(ids).distinct().sorted().forEach(id -> db.lock("users", id));
+  }
+
+  private Map<String, Object> lockOrder(Actor actor, long id) {
+    var snapshot = db.get("orders", id);
+    orderAccess(actor, snapshot);
+    lockUsers(actor.id(), number(snapshot, "cliente_id"));
     var order = db.lock("orders", id);
     orderAccess(actor, order);
+    return order;
+  }
+
+  private void releaseReservation(Map<String, Object> order, Map<String, Object> user, long actor,
+      String stockReason) {
+    long id = number(order, "id");
+    for (var item :
+        db.jdbc()
+            .queryForList("SELECT * FROM order_items WHERE pedido_id=? ORDER BY produto_id", id))
+      stockMove(
+          number(order, "unidade_id"),
+          number(item, "produto_id"),
+          number(item, "quantidade"),
+          stockReason,
+          actor,
+          id);
+    if (number(order, "pontos_resgate") > 0 && bool(user, "consent"))
+      loyaltyMove(number(order, "cliente_id"), number(order, "pontos_resgate"), "DEVOLUCAO", id);
+  }
+
+  private boolean expireReservation(Map<String, Object> order, Map<String, Object> user, long actor) {
+    if (!text(order, "status").equals("AGUARDANDO_PAGAMENTO")
+        || Instant.parse(text(order, "created_at"))
+            .isAfter(Instant.now().minusSeconds(reservationTtlSeconds))) return false;
+    long id = number(order, "id");
+    releaseReservation(order, user, actor, "CANCELAMENTO_EXPIRACAO");
+    db.jdbc().update("UPDATE orders SET status='CANCELADO',updated_at=? WHERE id=?", now(), id);
+    audit(actor, "PEDIDO_EXPIRADO", id);
+    return true;
+  }
+
+  @Transactional(readOnly = true)
+  public List<Long> expiredOrderIds() {
+    return db.jdbc()
+        .queryForList(
+            "SELECT id FROM orders WHERE status='AGUARDANDO_PAGAMENTO'"
+                + " AND CAST(created_at AS TIMESTAMP WITH TIME ZONE)"
+                + " <= CAST(? AS TIMESTAMP WITH TIME ZONE) ORDER BY id",
+            Long.class,
+            Instant.now().minusSeconds(reservationTtlSeconds).toString());
+  }
+
+  public boolean expireOrder(long id) {
+    long customer = number(db.get("orders", id), "cliente_id");
+    lockUsers(customer);
+    var order = db.lock("orders", id);
+    return expireReservation(order, db.get("users", customer), customer);
+  }
+
+  @Transactional(propagation = Propagation.NOT_SUPPORTED)
+  public PaymentResponse pay(Actor actor, long id, Scenario scenario, String key) {
+    // A deadline rejection happens only after its reservation release has committed.
+    PaymentResponse result = transactions.execute(transaction -> payReserved(actor, id, scenario, key));
+    require(result != null, "PEDIDO_EXPIRADO", "Prazo de pagamento do pedido expirou.");
+    return result;
+  }
+
+  private PaymentResponse payReserved(Actor actor, long id, Scenario scenario, String key) {
+    var order = lockOrder(actor, id);
+    var user = db.get("users", number(order, "cliente_id"));
     String digest = fingerprint(Map.of("pedidoId", id, "cenario", scenario));
     Long old = replay(actor, "PAGAMENTO", key, digest);
-    if (old != null) return payment(db.get("payments", old));
+    if (old != null) {
+      expireReservation(order, user, actor.id());
+      return payment(db.get("payments", old));
+    }
+    if (expireReservation(order, user, actor.id())) return null;
     require(
         text(order, "status").equals("AGUARDANDO_PAGAMENTO"),
         "PAGAMENTO_INVALIDO",
@@ -618,9 +727,7 @@ public class Services {
   }
 
   public OrderResponse status(Actor actor, long id, Status target) {
-    db.lock("users", actor.id());
-    var order = db.lock("orders", id);
-    orderAccess(actor, order);
+    var order = lockOrder(actor, id);
     if (actor.perfil() == Perfil.CLIENTE)
       require(
           target == Status.CANCELADO && text(order, "status").equals("AGUARDANDO_PAGAMENTO"),
@@ -632,20 +739,9 @@ public class Services {
           target == Status.PRONTO, "SEM_PERMISSAO", "Cozinha pode apenas marcar como pronto.", 403);
     Rules.transition(text(order, "status"), target);
     long customer = number(order, "cliente_id");
-    var user = db.lock("users", customer);
+    var user = db.get("users", customer);
     if (target == Status.CANCELADO) {
-      for (var item :
-          db.jdbc()
-              .queryForList("SELECT * FROM order_items WHERE pedido_id=? ORDER BY produto_id", id))
-        stockMove(
-            number(order, "unidade_id"),
-            number(item, "produto_id"),
-            number(item, "quantidade"),
-            "CANCELAMENTO",
-            actor.id(),
-            id);
-      if (number(order, "pontos_resgate") > 0 && bool(user, "consent"))
-        loyaltyMove(customer, number(order, "pontos_resgate"), "DEVOLUCAO", id);
+      releaseReservation(order, user, actor.id(), "CANCELAMENTO");
       db.jdbc()
           .update(
               "UPDATE payments SET status='ESTORNADO' WHERE pedido_id=? AND status='APROVADO'", id);

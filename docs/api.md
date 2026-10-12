@@ -21,7 +21,7 @@ Request:
 ```json
 {
   "perfil" : "CLIENTE",
-  "unidadeId" : 1
+  "unidadeId" : null
 }
 ```
 
@@ -29,14 +29,14 @@ Response HTTP 200:
 
 ```json
 {
-  "id" : 1,
-  "nome" : "texto",
+  "id" : 2,
+  "nome" : "Maria de estudo",
   "perfil" : "CLIENTE",
-  "unidadeId" : 1
+  "unidadeId" : null
 }
 ```
 
-Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+Erros: 401 autenticação, 403 autorização, 404 inexistente, 405 método HTTP, 406 representação, 409 regra/integridade, 415 tipo de conteúdo, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
 ## PUT /unidades/{id}
 
@@ -73,7 +73,7 @@ Response HTTP 200:
 }
 ```
 
-Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+Erros: 401 autenticação, 403 autorização, 404 inexistente, 405 método HTTP, 406 representação, 409 regra/integridade, 415 tipo de conteúdo, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
 ## PUT /produtos/{id}
 
@@ -110,7 +110,7 @@ Response HTTP 200:
 }
 ```
 
-Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+Erros: 401 autenticação, 403 autorização, 404 inexistente, 405 método HTTP, 406 representação, 409 regra/integridade, 415 tipo de conteúdo, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
 ## PUT /fidelidade/consentimento
 
@@ -142,7 +142,7 @@ Response HTTP 200:
 }
 ```
 
-Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+Erros: 401 autenticação, 403 autorização, 404 inexistente, 405 método HTTP, 406 representação, 409 regra/integridade, 415 tipo de conteúdo, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
 ## POST /usuarios
 
@@ -171,14 +171,16 @@ Response HTTP 201:
 
 ```json
 {
-  "id" : 1,
-  "nome" : "texto",
+  "id" : 2,
+  "nome" : "Maria de estudo",
   "perfil" : "CLIENTE",
-  "unidadeId" : 1
+  "unidadeId" : null
 }
 ```
 
-Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+Erros: 401 autenticação, 403 autorização, 404 inexistente, 405 método HTTP, 406 representação, 409 regra/integridade, 415 tipo de conteúdo, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+
+Limite de tentativas: HTTP 429 com Retry-After indicando os segundos até uma nova tentativa.
 
 ## GET /unidades
 
@@ -214,7 +216,7 @@ Response HTTP 200:
 }
 ```
 
-Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+Erros: 401 autenticação, 403 autorização, 404 inexistente, 405 método HTTP, 406 representação, 409 regra/integridade, 415 tipo de conteúdo, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
 ## POST /unidades
 
@@ -250,7 +252,7 @@ Response HTTP 201:
 }
 ```
 
-Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+Erros: 401 autenticação, 403 autorização, 404 inexistente, 405 método HTTP, 406 representação, 409 regra/integridade, 415 tipo de conteúdo, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
 ## POST /unidades/{id}/estoque/movimentos
 
@@ -287,7 +289,7 @@ Response HTTP 201:
 }
 ```
 
-Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+Erros: 401 autenticação, 403 autorização, 404 inexistente, 405 método HTTP, 406 representação, 409 regra/integridade, 415 tipo de conteúdo, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
 ## GET /produtos
 
@@ -323,7 +325,7 @@ Response HTTP 200:
 }
 ```
 
-Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+Erros: 401 autenticação, 403 autorização, 404 inexistente, 405 método HTTP, 406 representação, 409 regra/integridade, 415 tipo de conteúdo, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
 ## POST /produtos
 
@@ -359,7 +361,7 @@ Response HTTP 201:
 }
 ```
 
-Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+Erros: 401 autenticação, 403 autorização, 404 inexistente, 405 método HTTP, 406 representação, 409 regra/integridade, 415 tipo de conteúdo, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
 ## GET /pedidos
 
@@ -409,7 +411,7 @@ Response HTTP 200:
 }
 ```
 
-Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+Erros: 401 autenticação, 403 autorização, 404 inexistente, 405 método HTTP, 406 representação, 409 regra/integridade, 415 tipo de conteúdo, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
 ## POST /pedidos
 
@@ -429,13 +431,13 @@ Request:
 
 ```json
 {
-  "formaPagamento" : "MOCK",
   "itens" : [ {
-    "quantidade" : 2,
-    "produtoId" : 1
+    "produtoId" : 1,
+    "quantidade" : 2
   } ],
   "canalPedido" : "TOTEM",
-  "unidadeId" : 1
+  "unidadeId" : 1,
+  "formaPagamento" : "MOCK"
 }
 ```
 
@@ -462,7 +464,7 @@ Response HTTP 201:
 }
 ```
 
-Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+Erros: 401 autenticação, 403 autorização, 404 inexistente, 405 método HTTP, 406 representação, 409 regra/integridade, 415 tipo de conteúdo, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
 ## GET /pedidos/{id}/pagamentos
 
@@ -500,7 +502,7 @@ Response HTTP 200:
 }
 ```
 
-Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+Erros: 401 autenticação, 403 autorização, 404 inexistente, 405 método HTTP, 406 representação, 409 regra/integridade, 415 tipo de conteúdo, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
 ## POST /pedidos/{id}/pagamentos
 
@@ -537,7 +539,7 @@ Response HTTP 201:
 }
 ```
 
-Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+Erros: 401 autenticação, 403 autorização, 404 inexistente, 405 método HTTP, 406 representação, 409 regra/integridade, 415 tipo de conteúdo, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
 ## POST /auth/login
 
@@ -556,8 +558,8 @@ Request:
 
 ```json
 {
-  "senha" : "SenhaEstudo123!",
-  "email" : "maria@example.com"
+  "email" : "maria@example.com",
+  "senha" : "SenhaEstudo123!"
 }
 ```
 
@@ -569,15 +571,17 @@ Response HTTP 200:
   "tokenType" : "texto",
   "expiresIn" : 1,
   "user" : {
-    "id" : 1,
-    "nome" : "texto",
+    "id" : 2,
+    "nome" : "Maria de estudo",
     "perfil" : "CLIENTE",
-    "unidadeId" : 1
+    "unidadeId" : null
   }
 }
 ```
 
-Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+Erros: 401 autenticação, 403 autorização, 404 inexistente, 405 método HTTP, 406 representação, 409 regra/integridade, 415 tipo de conteúdo, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+
+Limite de tentativas: HTTP 429 com Retry-After indicando os segundos até uma nova tentativa.
 
 ## PATCH /pedidos/{id}/status
 
@@ -624,7 +628,7 @@ Response HTTP 200:
 }
 ```
 
-Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+Erros: 401 autenticação, 403 autorização, 404 inexistente, 405 método HTTP, 406 representação, 409 regra/integridade, 415 tipo de conteúdo, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
 ## GET /usuarios/me
 
@@ -647,14 +651,14 @@ Response HTTP 200:
 
 ```json
 {
-  "id" : 1,
-  "nome" : "texto",
+  "id" : 2,
+  "nome" : "Maria de estudo",
   "perfil" : "CLIENTE",
-  "unidadeId" : 1
+  "unidadeId" : null
 }
 ```
 
-Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+Erros: 401 autenticação, 403 autorização, 404 inexistente, 405 método HTTP, 406 representação, 409 regra/integridade, 415 tipo de conteúdo, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
 ## DELETE /usuarios/me
 
@@ -677,7 +681,7 @@ Response HTTP 204:
 
 Sem corpo.
 
-Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+Erros: 401 autenticação, 403 autorização, 404 inexistente, 405 método HTTP, 406 representação, 409 regra/integridade, 415 tipo de conteúdo, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
 ## GET /unidades/{id}/estoque
 
@@ -713,7 +717,7 @@ Response HTTP 200:
 }
 ```
 
-Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+Erros: 401 autenticação, 403 autorização, 404 inexistente, 405 método HTTP, 406 representação, 409 regra/integridade, 415 tipo de conteúdo, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
 ## GET /unidades/{id}/cardapio
 
@@ -751,7 +755,7 @@ Response HTTP 200:
 }
 ```
 
-Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+Erros: 401 autenticação, 403 autorização, 404 inexistente, 405 método HTTP, 406 representação, 409 regra/integridade, 415 tipo de conteúdo, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
 ## GET /pedidos/{id}
 
@@ -794,7 +798,7 @@ Response HTTP 200:
 }
 ```
 
-Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+Erros: 401 autenticação, 403 autorização, 404 inexistente, 405 método HTTP, 406 representação, 409 regra/integridade, 415 tipo de conteúdo, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
 ## GET /health
 
@@ -819,7 +823,7 @@ Response HTTP 200:
 { }
 ```
 
-Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+Erros: 401 autenticação, 403 autorização, 404 inexistente, 405 método HTTP, 406 representação, 409 regra/integridade, 415 tipo de conteúdo, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
 ## GET /fidelidade
 
@@ -859,7 +863,7 @@ Response HTTP 200:
 }
 ```
 
-Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+Erros: 401 autenticação, 403 autorização, 404 inexistente, 405 método HTTP, 406 representação, 409 regra/integridade, 415 tipo de conteúdo, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
 ## GET /auditoria
 
@@ -896,7 +900,7 @@ Response HTTP 200:
 }
 ```
 
-Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integridade, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
+Erros: 401 autenticação, 403 autorização, 404 inexistente, 405 método HTTP, 406 representação, 409 regra/integridade, 415 tipo de conteúdo, 422 validação, 503 banco ocupado; JSON ErrorResponse uniforme. Nem todos os erros se aplicam a toda rota.
 
 ## Padrão de erro
 
@@ -904,4 +908,4 @@ Erros: 401 autenticação, 403 autorização, 404 inexistente, 409 regra/integri
 {"error":"ESTOQUE_INSUFICIENTE","message":"Estoque insuficiente na unidade.","details":[],"timestamp":"2026-10-11T15:00:00Z","path":"/pedidos","requestId":"uuid"}
 ```
 
-HTTP 201 em pagamento significa tentativa persistida; examine status APROVADO/NEGADO/ERRO. Erros de validação omitem os valores enviados.
+HTTP 201 em pagamento significa tentativa persistida; examine status APROVADO/NEGADO/ERRO. O campo status representa o estado atual e pode mudar para ESTORNADO após cancelamento. payload preserva a resposta original do gateway mock, mesmo após o estorno. Erros de validação omitem os valores enviados.

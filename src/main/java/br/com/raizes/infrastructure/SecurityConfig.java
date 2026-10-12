@@ -10,9 +10,12 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -31,6 +34,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
+  @Bean
+  AuthRateLimiter authRateLimiter(
+      @Value("${app.auth-rate-limit-max-requests:20}") int maxRequests,
+      @Value("${app.auth-rate-limit-window-seconds:60}") long windowSeconds,
+      ObjectProvider<Clock> clock) {
+    return new AuthRateLimiter(maxRequests, windowSeconds, clock.getIfAvailable(Clock::systemUTC));
+  }
+
   @Bean
   PasswordEncoder encoder() {
     return new BCryptPasswordEncoder(12);
@@ -58,7 +69,12 @@ public class SecurityConfig {
   }
 
   @Bean
-  SecurityFilterChain security(HttpSecurity http, JwtService jwt, Store store, ObjectMapper mapper)
+  SecurityFilterChain security(
+      HttpSecurity http,
+      JwtService jwt,
+      Store store,
+      ObjectMapper mapper,
+      AuthRateLimiter authRateLimiter)
       throws Exception {
     var filter =
         new OncePerRequestFilter() {
@@ -71,6 +87,22 @@ public class SecurityConfig {
             response.setHeader("X-Request-ID", id);
             response.setHeader("Cache-Control", "no-store");
             response.setHeader("X-Content-Type-Options", "nosniff");
+            String path = request.getServletPath();
+            if ("POST".equals(request.getMethod())
+                && ("/auth/login".equals(path) || "/usuarios".equals(path))) {
+              var decision = authRateLimiter.check(request.getRemoteAddr());
+              if (!decision.allowed()) {
+                response.setHeader("Retry-After", Long.toString(decision.retryAfterSeconds()));
+                error(
+                    mapper,
+                    request,
+                    response,
+                    429,
+                    "LIMITE_REQUISICOES",
+                    "Limite de tentativas atingido. Tente novamente após o prazo informado.");
+                return;
+              }
+            }
             String header = request.getHeader("Authorization");
             if (header != null) {
               try {

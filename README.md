@@ -49,6 +49,10 @@ Veja `.env.example`. `scripts/InitLocal.java` gera JWT_SECRET e SEED_ADMIN_PASSW
 | DATABASE_PASSWORD | Opcional para banco local; para outro ambiente configure conforme sua política |
 | SEED_ENABLED | true por padrão; false desativa o seed |
 | PORT | 8000 por padrão |
+| ORDER_RESERVATION_TTL_SECONDS | Prazo de pagamento antes do cancelamento automático; padrão 1800 segundos |
+| ORDER_EXPIRATION_SCAN_MS | Intervalo de varredura de reservas vencidas; padrão 60000 milissegundos |
+| AUTH_RATE_LIMIT_MAX_REQUESTS | Orçamento combinado de login e cadastro por IP de conexão; padrão 20 |
+| AUTH_RATE_LIMIT_WINDOW_SECONDS | Janela do orçamento de autenticação; padrão 60 segundos |
 
 Nunca publique `.env`, banco local ou tokens. Segredos não são embutidos no código/JAR nem na configuração salva da nuvem. Não existem serviços externos de pagamento ou dados de cartão. O usuário `sa` do H2 é apenas conexão interna; o console H2 não está exposto.
 
@@ -68,6 +72,12 @@ Nunca publique `.env`, banco local ou tokens. Segredos não são embutidos no c�
 7. Consentimento facultativo em `/fidelidade/consentimento`: 1 ponto por real efetivamente pago é creditado na entrega. Resgate de 100 pontos reduz R$ 10, usando pontosResgate múltiplo de 100. Cupom NORDESTE10 dá 10% sobre subtotal mínimo de R$ 50.
 
 Pedidos baixam estoque e debitam resgate dentro da mesma transação. Locks por usuário/pedido/estoque impedem efeitos duplicados e venda além do saldo. Itens são bloqueados em ordem de produto para reduzir disputas. Dinheiro usa `long` em centavos. Cancelamento devolve estoque uma vez e estorna pagamento mock aprovado. Cliente só cancela enquanto aguarda pagamento; cozinha apenas marca PRONTO. Pedido entregue é terminal. Reenvio da mesma chave/corpo retorna o recurso no estado atual.
+
+Pedidos que continuam em `AGUARDANDO_PAGAMENTO` além do prazo configurado são cancelados automaticamente. A varredura devolve o estoque uma única vez e restitui pontos resgatados quando o consentimento continua ativo. O pagamento também verifica o vencimento dentro da operação transacional e responde HTTP 409 a um pedido expirado; não é preciso esperar a próxima varredura para impedir aprovação tardia. Pedidos pagos não expiram. O vencimento é calculado a partir de `created_at`, por isso continua funcionando após reiniciar a API.
+
+`POST /auth/login` e `POST /usuarios` compartilham um orçamento por IP de conexão. Ao excedê-lo, a API responde HTTP 429 com `Retry-After` em segundos e o envelope de erro habitual. O controle usa memória limitada e janelas por instância; reiniciar a JVM reinicia os contadores. Endereços de `X-Forwarded-For` não são aceitos como identidade do cliente. Uma implantação atrás de proxy precisa definir confiança no proxy e limites no ponto de entrada para evitar que todos os clientes compartilhem o mesmo orçamento.
+
+Métodos HTTP incompatíveis com a rota recebem 405 com `Allow`; corpo com tipo de mídia não suportado recebe 415; `Accept` sem representação disponível recebe 406. Os erros mantêm JSON com `requestId`. Em pagamentos, `status` é o estado atual da tentativa (inclusive `ESTORNADO`) e `payload` preserva a resposta original do gateway mock.
 
 ## Perfis
 
@@ -89,9 +99,9 @@ Crie uma conta de empregado por POST /usuarios. Como ADMIN, atribua perfil com P
 mvn verify
 ```
 
-A suíte JUnit 5 executa 32 testes de integração, um teste de migração persistente e um teste que percorre as **23 requisições da coleção**, com 46 grupos de asserções equivalentes ao fluxo Postman: **34 testes JUnit**, sem testes pulados. Os testes HTTP usam servidor real em porta aleatória e H2 em memória exclusivo; o teste de migração usa arquivo H2 em diretório temporário. Nenhum deles toca na base de desenvolvimento. Cobre concorrência, idempotência com autorização após transferência de unidade, 401/403/422/409, estoque, negativas/indisponibilidade de pagamento, consentimento, anonimização e repetição de seed.
+A suíte JUnit 5 executa **62 testes**, incluindo 32 testes originais de integração, quatro de erros HTTP, 14 de expiração e concorrência, sete do limite de autenticação, três de documentação, um de migração persistente e um que percorre as **23 requisições da coleção**, com 46 grupos de asserções equivalentes ao fluxo Postman. Não há testes pulados. Os testes HTTP usam servidor real em porta aleatória e H2 em memória exclusivo; o limite de autenticação também usa MockMvc e relógio controlado; a migração usa arquivo H2 em diretório temporário. Nenhum teste toca na base de desenvolvimento. A atualização V1→V2 preserva dados e valida os checksums existentes, sem editar a migration original.
 
-Evidências ficam em `target/surefire-reports`; resumos sanitizados desta execução estão em `docs/evidencias-junit-api.xml`, `docs/evidencias-junit-colecao.xml`, `docs/evidencias-junit-migracao.xml` e `docs/evidencias-colecao-java.json`. A evidência é da versão e da máquina em que os testes rodaram; importar a coleção não comprova sucesso.
+Evidências atuais ficam em `target/surefire-reports` e `target/evidencias-colecao-java.json`. Os resumos sanitizados versionados em `docs/evidencias-*` são históricos e não substituem uma execução da versão atual. A evidência é da versão e da máquina em que os testes rodaram; importar a coleção não comprova sucesso.
 
 Para usar Postman, importe [docs/postman_collection.json](docs/postman_collection.json), configure baseUrl para sua API e adminPassword em ambiente local privado. Execute T01–T23 em ordem; cliente e chave são gerados a cada execução. Não exporte senha/tokens da sessão. A coleção movimenta duas unidades do produto 1 no banco utilizado. Plano: [docs/plano-testes.md](docs/plano-testes.md). Ela também é executada por `CollectionContractTest` em Java; Newman não é necessário.
 
@@ -124,6 +134,15 @@ java -cp "target/test-classes:target/classes:$(cat target/docs-classpath.txt)" b
 
 `Documentation` é Java e usa PDFBox. Não há scripts Python de geração de PDF.
 
+Para regenerar apenas os contratos da API, sem precisar de `docs/relatorio.md`, Graphviz ou fontes:
+
+```bash
+./scripts/mvn.sh test-compile org.apache.maven.plugins:maven-dependency-plugin:3.8.1:build-classpath -Dmdep.includeScope=test -Dmdep.outputFile=target/docs-classpath.txt
+java -cp "target/test-classes:target/classes:$(cat target/docs-classpath.txt)" br.com.raizes.Documentation --api-only
+```
+
+Opcionalmente informe a URL-base antes de `--api-only`. O modo completo verifica a presença de `docs/relatorio.md` antes de acessar a API ou atualizar os artefatos. Os exemplos de CLIENTE usam `unidadeId: null`; apenas perfis operacionais recebem vínculo com unidade.
+
 O PDF único inclui capa, folha de rosto, sumário com páginas reais, seções do roteiro, referências, contratos, cenários de testes, evidências e diagramas. Formatação: A4, margens superior/esquerda de 3 cm e inferior/direita de 2 cm, fonte serifada de 12 pontos e espaçamento de 1,5 no texto; tabelas, códigos e referências usam espaçamento simples. Os diagramas ocupam páginas em paisagem. A numeração conta a partir da folha de rosto e aparece na introdução. Os dados de capa ficam em [docs/identificacao-academica.properties](docs/identificacao-academica.properties); Curso, período e identificação do trabalho foram fornecidos pelo estudante; polo e cidade permanecem pendentes. O nome Luciane Yanase Kanashiro foi obtido da capa do roteiro da Trilha Back-End. Campos `A INFORMAR` devem ser preenchidos antes da entrega. O manual ABNT institucional completo não foi fornecido e deve ser conferido no AVA.
 
 Para regenerar apenas o PDF, sem chamar a API nem alterar os diagramas:
@@ -139,8 +158,12 @@ Use o checkout existente; cada tarefa já tem ambiente isolado, sem criar worktr
 
 O código Java foi preparado para envio autorizado à branch main de https://github.com/jefersonrivaldo/raizes-do-nordeste . Repositório e coleção foram verificados sem autenticação em 11/10/2026 e retornaram HTTP 200. O acesso público está disponível para avaliação. Não foi feito deploy público ou fabricado histórico acadêmico de commits.
 
-O roteiro fornecido é uma cópia adaptada para estudo. Revise a versão oficial, o código e o relatório; confira a identificação acadêmica e ajuste a formatação exigida antes da entrega. H2 em arquivo é destinado ao estudo, sem alta disponibilidade validada. TLS público, rate limiting, banco de produção, backup, expiração de reservas e retenção automática são evoluções propostas. Pagamento e estorno são exclusivamente mock.
+O roteiro fornecido é uma cópia adaptada para estudo. Revise a versão oficial, o código e o relatório; confira a identificação acadêmica e ajuste a formatação exigida antes da entrega. H2 em arquivo é destinado ao estudo, sem alta disponibilidade validada. TLS público, proteção de tráfego distribuída, banco de produção, backup e retenção automática são evoluções propostas. Pagamento e estorno são exclusivamente mock.
 
 A coleção possui sete pastas sequenciais; execute todas em ordem T01–T23. O executor Java percorre pastas recursivamente. O teste de migração cria um H2 em arquivo, grava uma unidade, fecha a conexão e reabre o banco: Flyway valida o checksum, não reaplica V1 e preserva o registro.
 
 Validação adicional da coleção: Newman 6.2.1 executou os scripts Postman reais das sete pastas, com 23 requisições e 46 asserções aprovadas. Resumo sanitizado: [docs/evidencias-postman-newman.json](docs/evidencias-postman-newman.json). O runner externo não é uma dependência da API nem requisito para os testes Java.
+
+## Validação no GitHub
+
+O workflow `.github/workflows/ci.yml` executa `mvn --batch-mode --strict-checksums verify` com Java 21 em pushes para `main` e pull requests, e guarda os relatórios Surefire mesmo quando os testes falham. As actions estão fixadas por SHA e têm permissão de leitura. Dependabot acompanha mensalmente Maven e GitHub Actions; alertas de segurança dependem das configurações do repositório no GitHub.
