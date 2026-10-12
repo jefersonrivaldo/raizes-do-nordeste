@@ -120,6 +120,27 @@ class ApiIntegrationTest extends BaseApiTest {
   }
 
   @Test
+  void idempotenciaPedidoRespeitaTransferenciaDeUnidade() throws Exception {
+    long worker = register("atendente@example.com");
+    call(
+        "PUT", "/usuarios/" + worker + "/perfil",
+        Map.of("perfil", "ATENDENTE", "unidadeId", 1), admin, 200);
+    String employee = login("atendente@example.com", "SenhaTeste123");
+    var request = body(2, "BALCAO");
+    request.put("clienteId", clientId);
+    var first = call("POST", "/pedidos", request, employee, 201, "transfer-order-key");
+    assertEquals(
+        first.get("id"),
+        call("POST", "/pedidos", request, employee, 201, "transfer-order-key").get("id"));
+    call(
+        "PUT", "/usuarios/" + worker + "/perfil",
+        Map.of("perfil", "ATENDENTE", "unidadeId", 2), admin, 200);
+    call("GET", "/pedidos/" + first.get("id").asLong(), null, employee, 403);
+    call("POST", "/pedidos", request, employee, 403, "transfer-order-key");
+    assertEquals(98, stock());
+  }
+
+  @Test
   void filtroCanalEPaginacao() throws Exception {
     call("POST", "/pedidos", body(2, "TOTEM"), client, 201, "totem-order");
     assertEquals(
