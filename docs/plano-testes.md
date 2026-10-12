@@ -25,6 +25,8 @@ Executar no Postman as sete pastas em ordem, mantendo T01–T23; a mesma coleç�
 | T19 Pedido inexistente | `GET /pedidos/999999999`; `Sem corpo` | Fluxo anterior concluído | HTTP 404; asserções na requisição homônima |
 | T20 Transição inválida | `PATCH /pedidos/{{pedidoId}}/status`; `{"status": "PRONTO"}` | Fluxo anterior concluído | HTTP 409; asserções na requisição homônima |
 
+| ID | Requisição e entrada | Pré-condição | Saída esperada |
+|---|---|---|---|
 | T21 Unidade inexistente | `POST /pedidos`; unidadeId = 999999999; demais campos válidos | CLIENTE autenticado; chave de idempotência nova | HTTP 404; envelope de erro padronizado |
 | T22 Produto inexistente | `POST /pedidos`; produtoId = 999999999; demais campos válidos | CLIENTE autenticado; chave de idempotência nova | HTTP 404; envelope de erro padronizado |
 | T23 Auditoria de criação do pedido | `GET /auditoria?page=1&limit=100` | ADMIN autenticado; pedido criado anteriormente | HTTP 200; items contém evento PEDIDO_CRIADO |
@@ -56,6 +58,8 @@ A evidência de cada linha é a requisição de mesmo ID e nome em `docs/postman
 | T19 | Mesmas seis chaves do padrão de erro | Requisição T19; erro 404 para pedido inexistente |
 | T20 | Mesmas seis chaves do padrão de erro | Requisição T20; erro 409 ao tentar reabrir pedido entregue |
 
+| ID | Conteúdo esperado da resposta | Evidência e uso |
+|---|---|---|
 | T21 | Mesmas seis chaves do padrão de erro | Requisição T21; unidade inexistente na criação de pedido |
 | T22 | Mesmas seis chaves do padrão de erro | Requisição T22; produto inexistente na criação de pedido |
 | T23 | items contém evento PEDIDO_CRIADO | Requisição T23; consulta ADMIN comprova auditoria |

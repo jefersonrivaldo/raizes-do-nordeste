@@ -8,7 +8,7 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.regex.*;
 
-/** Geração de contratos, DER e PDF em Java; --api-only gera apenas os contratos. */
+/** Geração de contratos, diagramas e PDF da fonte revisada; --api-only gera apenas contratos. */
 public class Documentation {
   static ObjectMapper json = new ObjectMapper();
   static JsonNode schemas;
@@ -57,7 +57,7 @@ public class Documentation {
     }
     diagram();
     pdf();
-    System.out.println("Contratos, DER e relatório PDF gerados em Java.");
+    System.out.println("Contratos, cinco diagramas e PDF da fonte revisada gerados em Java.");
   }
 
   static void contracts(Options options, Path docs) throws Exception {
@@ -244,7 +244,7 @@ public class Documentation {
     for (String edge : edges) dot.append(edge).append('\n');
     dot.append('}');
     Files.writeString(Path.of("docs/diagramas/der.dot"), dot);
-    for (String name : List.of("der", "casos-de-uso", "classes", "arquitetura"))
+    for (String name : List.of("der", "casos-de-uso", "classes", "arquitetura", "sequencia"))
       for (String format : List.of("svg", "png")) {
         var pb =
             new ProcessBuilder(

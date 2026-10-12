@@ -1,11 +1,26 @@
 digraph Arquitetura {
- graph [rankdir=TB,bgcolor="white"]; node [shape=box,fontname="DejaVu Sans",fontsize=12,style="rounded,filled",fillcolor="#f0f7ed"];
- canais [label="APP / TOTEM / BALCAO / PICKUP / WEB"];
- api [label="API: Spring Boot / Bean Validation\nRotas, JWT, perfis e contratos"];
- application [label="Application: serviços de casos de uso\nPedidos, pagamento, status e fidelidade"];
- domain [label="Domain: regras puras\nCanal, perfil, status, transições, descontos"];
- infra [label="Infrastructure\nH2, migrations, hash, JWT, gateway mock"];
- db [shape=cylinder,label="H2 persistente"];
- gateway [label="Gateway MOCK (sem rede externa)"];
- canais -> api;api -> application;application -> domain;application -> infra;infra -> db;infra -> gateway;
+  graph [rankdir=TB, bgcolor="white", pad=0.2, nodesep=0.35, ranksep=0.5];
+  node [shape=box, fontname="DejaVu Sans", fontsize=12, style="rounded,filled", fillcolor="#f0f7ed", color="#333333"];
+  edge [fontname="DejaVu Sans", fontsize=10, color="#555555"];
+  canais [label="Canais de origem\nAPP / WEB / TOTEM / BALCAO / PICKUP"];
+  api [label="Camada API — Spring Boot\nRotas REST, Bean Validation e contratos\nJWT, autorização por perfil e unidade"];
+  limiter [label="AuthRateLimiter — infraestrutura\nPOST /auth/login e POST /usuarios\nLimite por IP; HTTP 429 + Retry-After"];
+  application [label="Camada de aplicação — Services\nPedidos, pagamentos, status e fidelidade\nTransações, idempotência e auditoria\nVerificação do vencimento antes do pagamento"];
+  expiration [label="OrderExpiration — infraestrutura\nVarredura periódica das reservas vencidas\nChama Services.expireOrder() por pedido\nCancela e restitui estoque/pontos uma única vez"];
+  domain [label="Camada de domínio — Rules\nCanal, perfil, status, transições e descontos\nRegras de negócio independentes da API"];
+  infra [label="Infraestrutura de persistência e integração\nSpring JDBC / Store; Flyway; BCrypt; JWT\nAdaptador de gateway mock"];
+  db [shape=cylinder, style=filled, label="H2 persistente em arquivo\nDados e created_at preservados\nMigrações V1 e V2 (índice de expiração)"];
+  gateway [label="Gateway de pagamento MOCK\nAPROVADO / NEGADO / ERRO\nSimulação local, sem acesso à rede externa"];
+  canais -> api [label="HTTP / JSON"];
+  api -> limiter [label="filtro de cadastro/login"];
+  api -> application;
+  expiration -> application [label="execução agendada"];
+  application -> domain;
+  application -> infra;
+  infra -> db;
+  infra -> gateway;
+  {rank=same; api; limiter;}
+  {rank=same; application; expiration;}
+  {rank=same; domain; infra;}
+  {rank=same; db; gateway;}
 }

@@ -1,15 +1,27 @@
-digraph Classes {
- graph [rankdir=LR,bgcolor="white"];node [shape=record,fontname="DejaVu Sans",fontsize=11];edge [fontname="DejaVu Sans",fontsize=10];
- Usuario [label="{Usuario|id; nome; email; hashSenha\lperfil; unidadeId; ativo\lconsentimento; pontos\l|consentir(); desidentificar()}"];
- Unidade [label="{Unidade|id; nome; endereco; ativo}"];
- Produto [label="{Produto|id; nome; descricao; ativo}"];
- Estoque [label="{Estoque|unidadeId; produtoId\lquantidade; precoCentavos\l|movimentar()}"];
- Pedido [label="{Pedido|id; clienteId; unidadeId; canalPedido\lstatus; totalCentavos; pontosResgate\l|criar(); transicionar(); cancelar()}"];
- Item [label="{ItemPedido|produtoId; nomeHistorico\lquantidade; precoUnitarioCentavos}"];
- Pagamento [label="{Pagamento|pedidoId; status; valorCentavos\lpayloadGateway\l|solicitarMock()}"];
- Movimento [label="{MovimentoFidelidade|usuarioId; pedidoId; quantidade; motivo}"];
- Usuario -> Pedido [label="1 : 0..N"];Unidade -> Pedido [label="1 : 0..N"];
- Unidade -> Estoque [label="1 : 0..N"];Produto -> Estoque [label="1 : 0..N"];
- Pedido -> Item [label="1 : 1..N"];Produto -> Item [label="1 : 0..N"];
- Pedido -> Pagamento [label="1 : 0..N"];Usuario -> Movimento [label="1 : 0..N"];
+digraph ClassesConceituais {
+  graph [rankdir=TB, bgcolor="white", pad=0.2, nodesep=0.45, ranksep=0.65];
+  node [shape=record, fontname="DejaVu Sans", fontsize=12, color="#333333"];
+  edge [fontname="DejaVu Sans", fontsize=10, color="#555555"];
+  Usuario [label="{Usuário|id; nome; email; hashSenha\lperfil; unidadeId; ativo\lconsentimento; pontos\l|consentir()\ldesidentificar()\l}"];
+  Unidade [label="{Unidade|id; nome; endereço; ativo\l}"];
+  Produto [label="{Produto|id; nome; descrição; ativo\l}"];
+  Estoque [label="{Estoque|unidadeId; produtoId\lquantidade; preçoCentavos\l|movimentar()\l}"];
+  Pedido [label="{Pedido|id; clienteId; unidadeId; canalPedido\lstatus; totalCentavos; pontosResgate\lcriadoAt; atualizadoAt\l|criar(); transicionar()\lcancelar(); expirarReserva()\l}"];
+  Item [label="{ItemPedido|produtoId; nomeHistórico\lquantidade; preçoUnitárioCentavos\l}"];
+  Pagamento [label="{Pagamento|pedidoId; status; valorCentavos\lpayloadGateway; criadoAt\l|solicitarMock()\l}"];
+  Movimento [label="{MovimentoFidelidade|usuarioId; pedidoId\lquantidade; motivo; criadoAt\l}"];
+  Nota [shape=note, fontsize=10, label="Modelo conceitual de domínio, sem mapeamento ORM.\nExpiração: apenas AGUARDANDO_PAGAMENTO vencido\ntransita para CANCELADO, devolve estoque e, com\nconsentimento ativo, restitui os pontos resgatados.\nOs serviços executam essas regras transacionalmente."];
+  {rank=same; Usuario; Unidade; Produto;}
+  {rank=same; Pedido; Estoque;}
+  {rank=same; Pagamento; Item; Movimento;}
+  Usuario -> Pedido [label="cliente: 1 : 0..N"];
+  Unidade -> Pedido [label="1 : 0..N"];
+  Unidade -> Estoque [label="1 : 0..N"];
+  Produto -> Estoque [label="1 : 0..N"];
+  Pedido -> Item [label="1 : 1..N", arrowtail=diamond, dir=both, arrowhead=none];
+  Produto -> Item [label="1 : 0..N"];
+  Pedido -> Pagamento [label="1 : 0..N"];
+  Usuario -> Movimento [label="1 : 0..N"];
+  Pedido -> Movimento [label="0..1 : 0..N"];
+  Pedido -> Nota [style=dashed, arrowhead=none];
 }

@@ -1,15 +1,12 @@
 package br.com.raizes;
 
-import com.fasterxml.jackson.databind.*;
 import java.awt.Color;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.time.*;
 import java.util.*;
 import java.util.regex.*;
 import javax.imageio.ImageIO;
-import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.pdfbox.pdmodel.*;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
@@ -151,8 +148,8 @@ public final class AcademicReport implements AutoCloseable {
     y -= reference ? 12 : 6;
   }
 
-  void heading(String title, boolean main) throws IOException {
-    if (main) newPage(false);
+  void heading(String title, boolean main, boolean landscape) throws IOException {
+    if (main) newPage(landscape);
     else ensure(70);
     List<String> lines = wrap(title, bold, 12, width());
     if (main) toc.add(new Entry(title, page, doc.getNumberOfPages() - 1));
@@ -177,10 +174,7 @@ public final class AcademicReport implements AutoCloseable {
   }
 
   void table(List<String> source) throws IOException {
-    if (source.size() == 1 || (source.size() == 2 && source.get(1).matches("\\|[|: -]+\\|"))) {
-      paragraph("Não se aplicam parâmetros path/query nesta operação.");
-      return;
-    }
+    tableNumber++;
     String[] header = cells(source.get(0));
     int n = header.length;
     float[] fraction =
@@ -188,21 +182,12 @@ public final class AcademicReport implements AutoCloseable {
             ? new float[] {.13f, .35f, .52f}
             : n == 4
                 ? new float[] {.19f, .37f, .21f, .23f}
-                : n == 5 ? new float[] {.10f, .28f, .18f, .25f, .19f} : null;
+                : n == 5
+                    ? new float[] {.48f, .13f, .13f, .13f, .13f}
+                    : null;
     float[] widths = new float[n];
     for (int i = 0; i < n; i++) widths[i] = width() * (fraction == null ? 1f / n : fraction[i]);
-    ensure(85);
-    draw(
-        "Tabela "
-            + (++tableNumber)
-            + " — "
-            + clean(header[0].trim())
-            + " e informações relacionadas",
-        LEFT,
-        y,
-        regular,
-        10);
-    y -= 18;
+    ensure(60);
     tableRow(header, widths, true);
     for (int i = 1; i < source.size(); i++) {
       if (source.get(i).matches("\\|[|: -]+\\|")) continue;
@@ -214,9 +199,7 @@ public final class AcademicReport implements AutoCloseable {
       }
       tableRow(row, widths, false);
     }
-    ensure(22);
-    draw("Fonte: artefatos do projeto Raízes do Nordeste (2026).", LEFT, y - 10, regular, 10);
-    y -= 30;
+    y -= 6;
   }
 
   float rowHeight(String[] values, float[] widths, PDType0Font font) throws IOException {
@@ -253,7 +236,34 @@ public final class AcademicReport implements AutoCloseable {
     y -= height;
   }
 
-  void markdown(Path path, boolean appendix) throws Exception {
+  void note(String text) throws IOException {
+    for (String line : wrap(text, regular, 10, width())) {
+      ensure(12);
+      draw(line, LEFT, y, regular, 10);
+      y -= 12;
+    }
+    y -= 6;
+  }
+
+  void image(Path path) throws Exception {
+    var image = LosslessFactory.createFromImage(doc, ImageIO.read(path.toFile()));
+    float available = y - BOTTOM - 70;
+    if (available < 80) {
+      newPage(true);
+      available = y - BOTTOM - 70;
+    }
+    float scale = Math.min(width() / image.getWidth(), available / image.getHeight());
+    float height = image.getHeight() * scale;
+    out.drawImage(
+        image,
+        LEFT + (width() - image.getWidth() * scale) / 2,
+        y - height,
+        image.getWidth() * scale,
+        height);
+    y -= height + 18;
+  }
+
+  void markdown(Path path) throws Exception {
     List<String> lines = Files.readAllLines(path);
     StringBuilder paragraph = new StringBuilder();
     for (int i = 0; i < lines.size(); i++) {
@@ -268,11 +278,32 @@ public final class AcademicReport implements AutoCloseable {
         codeLine(line);
         continue;
       }
-      if (line.startsWith("# ")) continue;
-      if (line.startsWith("Autor:") || line.startsWith("RU:")) continue;
-      if (line.startsWith("##")) {
+      if (line.startsWith(":::")) {
         flush(paragraph);
-        heading(line.replaceFirst("^#+\\s*", ""), !appendix && line.startsWith("## "));
+        continue;
+      }
+      if (line.startsWith("Autor:") || line.startsWith("RU:")) continue;
+      if (line.startsWith("#")) {
+        flush(paragraph);
+        String title = line.replaceFirst("^#+\\s*", "");
+        heading(title, line.startsWith("# "), title.matches("^APÊNDICE [D-H] —.*"));
+        continue;
+      }
+      var image = Pattern.compile("^!\\[[^]]*]\\(([^)]+)\\).*$").matcher(line);
+      if (image.matches()) {
+        flush(paragraph);
+        image(path.toAbsolutePath().getParent().resolve(image.group(1)).normalize());
+        continue;
+      }
+      if (line.startsWith("Tabela ") || line.startsWith("Figura ") || line.startsWith("Fonte:")) {
+        flush(paragraph);
+        if (line.startsWith("Tabela ")) ensure(80);
+        note(line);
+        continue;
+      }
+      if (line.startsWith("Fonte editável:")) {
+        flush(paragraph);
+        note(line);
         continue;
       }
       if (line.startsWith("|")) {
@@ -354,97 +385,6 @@ public final class AcademicReport implements AutoCloseable {
     tocPage = page;
   }
 
-  void evidence() throws Exception {
-    heading("APÊNDICE C — EVIDÊNCIAS DE EXECUÇÃO", true);
-    paragraph(
-        "Os registros abaixo provêm dos artefatos de execução disponíveis no projeto. A execução de"
-            + " teste em banco temporário é distinta da verificação de persistência em arquivo após"
-            + " reinício. Não são utilizados dados pessoais de clientes reais.");
-    var factory = DocumentBuilderFactory.newInstance();
-    factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-    List<String> rows =
-        new ArrayList<>(List.of("| Suíte | Executados | Falhas / erros / ignorados |"));
-    for (String name : List.of("ApiIntegrationTest", "CollectionContractTest", "DatabaseMigrationTest")) {
-      Path file = Path.of("target/surefire-reports/TEST-br.com.raizes." + name + ".xml");
-      if (!Files.exists(file))
-        file =
-            Path.of(
-                "docs/evidencias-junit-" + (name.startsWith("Api") ? "api" : name.startsWith("Collection") ? "colecao" : "migracao") + ".xml");
-      var root = factory.newDocumentBuilder().parse(file.toFile()).getDocumentElement();
-      rows.add(
-          "| "
-              + name
-              + " | "
-              + root.getAttribute("tests")
-              + " | "
-              + root.getAttribute("failures")
-              + " / "
-              + root.getAttribute("errors")
-              + " / "
-              + root.getAttribute("skipped")
-              + " |");
-    }
-    table(rows);
-    paragraph(
-        "Comando de validação: mvn verify. A execução registrada nesta revisão de 11 out. 2026 "
-            + "aprovou 33 testes Java: 31 de integração, um executor de 23 requisições da coleção "
-            + "e um de migração em arquivo H2 existente; zero falhas, erros ou ignorados. "
-            + "O executor percorre as sete pastas da coleção na ordem do fluxo. "
-            + "Os relatórios sanitizados estão em docs/evidencias-junit-api.xml, "
-            + "docs/evidencias-junit-colecao.xml e docs/evidencias-junit-migracao.xml.");
-    ObjectMapper mapper = new ObjectMapper();
-    for (String file :
-        List.of("docs/evidencias-colecao-java.json", "docs/evidencias-runtime-java.json", "docs/evidencias-postman-newman.json")) {
-      paragraph(
-          "Registro: "
-              + file
-              + ". A data executadoEm está expressa em UTC. A coleção foi validada em Java com"
-              + " asserções equivalentes em Java; o arquivo separado de Newman registra a execução"
-              + " dos scripts Postman reais. O registro de runtime mantém sua data histórica.");
-      codeLine(
-          mapper
-              .writerWithDefaultPrettyPrinter()
-              .writeValueAsString(mapper.readTree(Path.of(file).toFile()))
-              .replace("\r", ""));
-    }
-    paragraph(
-        "Cobertura complementar: auditoriaEOpenApi verifica PEDIDO_CRIADO na auditoria;"
-            + " cupomERecursoAusente verifica unidade inexistente (404);"
-            + " quantidadeFracionariaRejeitada verifica formato numérico inválido (422). Estes são"
-            + " testes JUnit adicionais, ainda não representados por requisições próprias na"
-            + " coleção Postman.");
-  }
-
-  void diagram(String name, String title, boolean landscape) throws Exception {
-    newPage(landscape);
-    toc.add(new Entry(title, page, doc.getNumberOfPages() - 1));
-    draw(title, LEFT, y, bold, 12);
-    y -= 35;
-    var image =
-        LosslessFactory.createFromImage(
-            doc, ImageIO.read(Path.of("docs/diagramas/" + name + ".png").toFile()));
-    float available = y - BOTTOM - 40,
-        scale = Math.min(width() / image.getWidth(), available / image.getHeight());
-    out.drawImage(
-        image,
-        LEFT + (width() - image.getWidth() * scale) / 2,
-        y - image.getHeight() * scale,
-        image.getWidth() * scale,
-        image.getHeight() * scale);
-    draw(
-        "Fonte: elaboração para o projeto Raízes do Nordeste (2026).",
-        LEFT,
-        BOTTOM + 14,
-        regular,
-        10);
-    draw(
-        "Fonte editável e imagem ampliável: docs/diagramas/" + name + ".",
-        LEFT,
-        BOTTOM,
-        regular,
-        10);
-  }
-
   void finish() throws IOException {
     closeStream();
     page = tocPage;
@@ -497,37 +437,23 @@ public final class AcademicReport implements AutoCloseable {
     doc.getDocumentInformation().setTitle("Raízes do Nordeste — Projeto Back-End");
     doc.getDocumentInformation().setAuthor(p("nome"));
     doc.getDocumentInformation().setSubject("Projeto Multidisciplinar — RU " + p("ru"));
-    doc.save("docs/" + p("ru") + "_Projeto_Back_End.pdf");
-    Files.copy(
-        Path.of("docs/" + p("ru") + "_Projeto_Back_End.pdf"),
-        Path.of("docs/relatorio-tecnico.pdf"),
-        StandardCopyOption.REPLACE_EXISTING);
+    Files.createDirectories(Path.of("output"));
+    doc.save("output/" + p("ru") + "_Projeto_Back_End_JAVA.pdf");
   }
 
   public static void generate() throws Exception {
     try (var report = new AcademicReport()) {
       report.pretext();
-      report.markdown(Path.of("docs/relatorio.md"), false);
-      report.heading("APÊNDICE A — CONTRATOS E EXEMPLOS DA API", true);
-      report.paragraph(
-          "Os exemplos são ilustrativos e seguem os esquemas da API implementada. IDs e timestamps"
-              + " devem ser substituídos pelos dados da execução. Valores monetários são inteiros"
-              + " em centavos. Nem todo código de erro listado se aplica a toda operação.");
-      report.markdown(Path.of("docs/api.md"), true);
-      report.heading("APÊNDICE B — CENÁRIOS DE TESTE DA API", true);
-      report.markdown(Path.of("docs/plano-testes.md"), true);
-      report.evidence();
-      report.diagram("casos-de-uso", "APÊNDICE D — DIAGRAMA DE CASOS DE USO", true);
-      report.diagram("classes", "APÊNDICE E — DIAGRAMA CONCEITUAL DE CLASSES", true);
-      report.diagram("arquitetura", "APÊNDICE F — ARQUITETURA EM CAMADAS", true);
-      report.diagram("der", "APÊNDICE G — DIAGRAMA ENTIDADE-RELACIONAMENTO", true);
+      report.markdown(Path.of("docs/relatorio.md"));
       report.finish();
       System.out.println(
-          "PDF acadêmico gerado: docs/"
+          "PDF acadêmico gerado: output/"
               + report.p("ru")
-              + "_Projeto_Back_End.pdf ("
+              + "_Projeto_Back_End_JAVA.pdf ("
               + report.doc.getNumberOfPages()
-              + " páginas)");
+              + " páginas, "
+              + report.tableNumber
+              + " tabelas)");
     }
   }
 

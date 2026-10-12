@@ -118,12 +118,12 @@ src/test/java/br/com/raizes/      integração HTTP, coleção e documentação 
 scripts/                         ferramentas Java e comandos de Maven/JVM
 ```
 
-- O relatório acadêmico em PDF e Word foi removido do Git; as cópias são mantidas localmente pelo autor.
-- [DER PDF](docs/diagramas/der.pdf), [DER SVG](docs/diagramas/der.svg), casos de uso, classes e arquitetura em `docs/diagramas`.
+- A [fonte completa do relatório revisado](docs/relatorio.md) está publicada para consulta e rastreabilidade. Preserva **40 tabelas**, **cinco figuras**, evidências da suíte de **62 testes** e a declaração de uso de IA ao final. Os arquivos PDF e Word gerados são mantidos fora do Git.
+- [DER PDF](docs/diagramas/der.pdf), [DER SVG](docs/diagramas/der.svg), casos de uso, classes, arquitetura e atividade em `docs/diagramas`.
 - [Contratos da API](docs/api.md), [OpenAPI](docs/openapi.json), [coleção](docs/postman_collection.json) e [sequência](docs/sequencia.md).
 - LGPD: BCrypt com custo 12, JWT com expiração, controle por perfil/unidade, auditoria sem credenciais, consentimento revogável e desidentificação que invalida os tokens existentes. IDs históricos permanecem, portanto não há garantia de anonimização irreversível em sistemas externos. Retenção automática não está implementada.
 
-O texto-fonte `docs/relatorio.md` foi removido do Git e deve ser restaurado a partir da cópia local antes de executar os geradores de documentação abaixo. O gerador também recria a cópia `docs/relatorio-tecnico.pdf`. A execução da API e dos testes não depende desses arquivos.
+A fonte `docs/relatorio.md` reúne o conteúdo completo do PDF corrigido: corpo, referências, contratos, cenários, evidências, diagramas e declaração. `AcademicReport` lê somente essa fonte e as imagens referenciadas; não recompõe apêndices nem substitui evidências documentadas por registros históricos. A execução da API e dos testes não depende da geração do relatório.
 
 Regenerar documentação com API iniciada (Graphviz, Liberation Serif e DejaVu instalados):
 
@@ -132,7 +132,7 @@ Regenerar documentação com API iniciada (Graphviz, Liberation Serif e DejaVu i
 java -cp "target/test-classes:target/classes:$(cat target/docs-classpath.txt)" br.com.raizes.Documentation
 ```
 
-`Documentation` é Java e usa PDFBox. Não há scripts Python de geração de PDF.
+`Documentation` atualiza os contratos OpenAPI/Markdown e regenera os cinco diagramas PNG/SVG antes de renderizar `docs/relatorio.md` com PDFBox. Esse comando preserva o texto da fonte completa. Depois de mudar a API ou suas evidências, revise os trechos correspondentes da fonte antes de gerar um novo relatório.
 
 Para regenerar apenas os contratos da API, sem precisar de `docs/relatorio.md`, Graphviz ou fontes:
 
@@ -143,14 +143,20 @@ java -cp "target/test-classes:target/classes:$(cat target/docs-classpath.txt)" b
 
 Opcionalmente informe a URL-base antes de `--api-only`. O modo completo verifica a presença de `docs/relatorio.md` antes de acessar a API ou atualizar os artefatos. Os exemplos de CLIENTE usam `unidadeId: null`; apenas perfis operacionais recebem vínculo com unidade.
 
-O PDF único inclui capa, folha de rosto, sumário com páginas reais, seções do roteiro, referências, contratos, cenários de testes, evidências e diagramas. Formatação: A4, margens superior/esquerda de 3 cm e inferior/direita de 2 cm, fonte serifada de 12 pontos e espaçamento de 1,5 no texto; tabelas, códigos e referências usam espaçamento simples. Os diagramas ocupam páginas em paisagem. A numeração conta a partir da folha de rosto e aparece na introdução. Os dados de capa ficam em [docs/identificacao-academica.properties](docs/identificacao-academica.properties); Curso, período e identificação do trabalho foram fornecidos pelo estudante; polo e cidade permanecem pendentes. O nome Luciane Yanase Kanashiro foi obtido da capa do roteiro da Trilha Back-End. Campos `A INFORMAR` devem ser preenchidos antes da entrega. O manual ABNT institucional completo não foi fornecido e deve ser conferido no AVA.
+O PDF único inclui capa, folha de rosto, sumário com páginas reais, seções do roteiro, referências, contratos, cenários de testes, evidências, cinco diagramas e declaração. Formatação: A4, margens superior/esquerda de 3 cm e inferior/direita de 2 cm, fonte serifada de 12 pontos e espaçamento de 1,5 no texto; tabelas, códigos e referências usam espaçamento simples. Os diagramas ocupam páginas em paisagem. A numeração conta a partir da folha de rosto e aparece na introdução. Os dados de capa ficam em [docs/identificacao-academica.properties](docs/identificacao-academica.properties); curso, período e identificação do trabalho foram fornecidos pelo estudante; polo e cidade são **Cariacica/ES**. O nome Luciane Yanase Kanashiro foi obtido da capa do roteiro da Trilha Back-End. O manual ABNT institucional completo não foi fornecido e deve ser conferido no AVA.
 
-Para regenerar apenas o PDF, sem chamar a API nem alterar os diagramas:
+A [declaração de uso de IA](docs/declaracao-uso-ia.md), incluída ao final da fonte e do relatório, registra exatamente: “Declaro o uso de inteligência artificial, por meio do Word Copilot, para revisão ortográfica, organização do texto.”
+
+A revisão acadêmica mantém o PDF e o Word editável em `output/4937546_Projeto_Back_End_FINAL.PDF` e `output/4937546_Projeto_Back_End_FINAL.docx`, fora do Git. A fonte completa correspondente está em `docs/relatorio.md`; os arquivos locais de edição e acabamento ficam em `output/`. Os diagramas em `docs/diagramas/` incluem o Gateway mock explícito, a separação dos perfis, a expiração de reservas e um diagrama de atividade complementar em `sequencia.dot`. No Word, atualize o campo do sumário após editar ou abrir o documento.
+
+Para conferir o conteúdo da fonte completa por uma renderização Java independente, sem chamar a API nem alterar os diagramas:
 
 ```bash
 ./scripts/mvn.sh test-compile org.apache.maven.plugins:maven-dependency-plugin:3.8.1:build-classpath -Dmdep.includeScope=test -Dmdep.outputFile=target/docs-classpath.txt
 java -cp "target/test-classes:target/classes:$(cat target/docs-classpath.txt)" br.com.raizes.AcademicReport
 ```
+
+Esse comando gera `output/4937546_Projeto_Back_End_JAVA.pdf`, com as 40 tabelas, cinco figuras e declaração presentes na fonte publicada. Preserva os PDF e Word finais; sua paginação e acabamento podem diferir da versão final da entrega. As evidências mantêm as datas e o contexto registrados em `docs/relatorio.md`; gerar o PDF não executa os testes.
 
 ## Nuvem e publicação
 

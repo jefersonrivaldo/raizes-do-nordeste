@@ -1,0 +1,61 @@
+// Diagrama de atividade complementar do fluxo descrito em docs/sequencia.md.
+// Expiração detalha a regra adicionada à implementação e ao relatório.
+digraph FluxoCritico {
+  graph [rankdir=TB, bgcolor="white", pad=0.15, nodesep=0.15, ranksep=0.25, compound=true];
+  node [shape=box, style="rounded", fontname="DejaVu Sans", fontsize=12, color="#333333", margin="0.07,0.05"];
+  edge [fontname="DejaVu Sans", fontsize=10, color="#555555"];
+
+  subgraph cluster_criacao {
+    label="1. Criação e reserva"; fontname="DejaVu Sans"; fontsize=13; color="#888888";
+    inicio [shape=circle, label="", width=0.15, style=filled, fillcolor="#333333"];
+    requisicao [label="Cliente → API\nPOST /pedidos\nJWT + canalPedido + chave"];
+    contrato [label="API → aplicação\nValidar contrato,\nperfil e unidade"];
+    transacao [label="Aplicação → H2\nTransação + FOR UPDATE\nValidar estoque / pontos"];
+    disponivel [shape=diamond, label="Estoque / pontos\ndisponíveis?", style=solid];
+    gravar [label="Gravar pedido + itens\nBaixar estoque\nResgatar pontos (opcional)\nAuditoria + idempotência\nCOMMIT"];
+    aguardando [label="HTTP 201 para cliente\nAGUARDANDO_PAGAMENTO"];
+    falha [label="ROLLBACK\nHTTP 409\nErro padronizado"];
+    fimErro [shape=doublecircle, label="", width=0.16, style=solid];
+    inicio -> requisicao -> contrato -> transacao -> disponivel;
+    disponivel -> gravar [label="sim"];
+    disponivel -> falha [label="não"];
+    gravar -> aguardando;
+    falha -> fimErro;
+  }
+  subgraph cluster_pagamento {
+    label="2. Pagamento mock e vencimento"; fontname="DejaVu Sans"; fontsize=13; color="#888888";
+    pagar [label="Cliente → API → aplicação\nPOST pagamento do pedido\nJWT + chave"];
+    prazo [shape=diamond, label="Reserva venceu\nantes de pagar?", style=solid];
+    expirar [label="H2: CANCELADO\nDevolver estoque uma vez\nRestituir pontos com\nconsentimento ativo\nAuditar e confirmar"];
+    rejeitar [label="HTTP 409 para cliente\nPEDIDO_EXPIRADO"];
+    fimExpirado [shape=doublecircle, label="", width=0.16, style=solid];
+    gateway [label="Aplicação → Gateway mock\nPedido + total em centavos\nAPROVADO / NEGADO / ERRO"];
+    tentativa [label="H2: tentativa + payload\nIdempotência + auditoria"];
+    aprovado [shape=diamond, label="Pagamento\naprovado?", style=solid];
+    negar [label="HTTP 201: tentativa registrada\nPedido permanece\nAGUARDANDO_PAGAMENTO"];
+    fimNegado [shape=doublecircle, label="", width=0.16, style=solid];
+    agendador [shape=note, style=solid, fontsize=10, label="OrderExpiration executa\no mesmo cancelamento\npara reservas vencidas\ne não pagas."];
+    pagar -> prazo;
+    prazo -> expirar [label="sim"];
+    expirar -> rejeitar -> fimExpirado;
+    prazo -> gateway [label="não"];
+    gateway -> tentativa -> aprovado;
+    aprovado -> negar [label="não"];
+    negar -> fimNegado;
+    agendador -> expirar [style=dashed, arrowhead=none];
+  }
+  subgraph cluster_entrega {
+    label="3. Preparo e entrega"; fontname="DejaVu Sans"; fontsize=13; color="#888888";
+    preparar [label="H2: EM_PREPARO\nHTTP 201: aprovado"];
+    cozinha [label="Cozinha → API\nPATCH status: PRONTO"];
+    pronto [label="Validar perfil / unidade\ne transição\nH2: PRONTO + auditoria"];
+    atendimento [label="Atendimento → API\nPATCH status: ENTREGUE"];
+    entregar [label="Validar perfil / unidade\ne transição\nH2: ENTREGUE + auditoria\nPontos se consentimento ativo"];
+    fim [shape=doublecircle, label="", width=0.16, style=solid];
+    preparar -> cozinha -> pronto -> atendimento -> entregar -> fim;
+  }
+
+  // Ligações entre fases não alongam o fluxo vertical; leitura em paisagem.
+  aguardando -> pagar [constraint=false, label="solicitar pagamento"];
+  aprovado -> preparar [constraint=false, label="sim"];
+}
