@@ -89,7 +89,7 @@ Crie uma conta de empregado por POST /usuarios. Como ADMIN, atribua perfil com P
 mvn verify
 ```
 
-A suíte JUnit 5 executa 31 testes de integração, um teste de migração persistente e um teste que percorre as **23 requisições da coleção**, com 46 grupos de asserções equivalentes ao fluxo Postman: **33 testes JUnit**, sem testes pulados. Os testes HTTP usam servidor real em porta aleatória e H2 em memória exclusivo; o teste de migração usa arquivo H2 em diretório temporário. Nenhum deles toca na base de desenvolvimento. Cobre concorrência, idempotência, 401/403/422/409, estoque, negativas/indisponibilidade de pagamento, consentimento, anonimização e repetição de seed.
+A suíte JUnit 5 executa 32 testes de integração, um teste de migração persistente e um teste que percorre as **23 requisições da coleção**, com 46 grupos de asserções equivalentes ao fluxo Postman: **34 testes JUnit**, sem testes pulados. Os testes HTTP usam servidor real em porta aleatória e H2 em memória exclusivo; o teste de migração usa arquivo H2 em diretório temporário. Nenhum deles toca na base de desenvolvimento. Cobre concorrência, idempotência com autorização após transferência de unidade, 401/403/422/409, estoque, negativas/indisponibilidade de pagamento, consentimento, anonimização e repetição de seed.
 
 Evidências ficam em `target/surefire-reports`; resumos sanitizados desta execução estão em `docs/evidencias-junit-api.xml`, `docs/evidencias-junit-colecao.xml`, `docs/evidencias-junit-migracao.xml` e `docs/evidencias-colecao-java.json`. A evidência é da versão e da máquina em que os testes rodaram; importar a coleção não comprova sucesso.
 

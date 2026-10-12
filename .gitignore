@@ -10,3 +10,4 @@ data/
 .vscode/
 
 .m2/
+/output/

@@ -428,7 +428,10 @@ public class Services {
     db.lock("users", actor.id());
     String digest = fingerprint(data);
     Long old = replay(actor, "PEDIDO", key, digest);
-    if (old != null) return order(old);
+    if (old != null) {
+      orderAccess(actor, db.get("orders", old));
+      return order(old);
+    }
     require(
         bool(db.get("units", data.unidadeId()), "active"), "UNIDADE_INATIVA", "Unidade inativa.");
     long customer = data.clienteId() == null ? actor.id() : data.clienteId();
