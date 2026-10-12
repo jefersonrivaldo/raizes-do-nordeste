@@ -142,10 +142,24 @@ class ApiIntegrationTest extends BaseApiTest {
 
   @Test
   void filtroCanalEPaginacao() throws Exception {
-    call("POST", "/pedidos", body(2, "TOTEM"), client, 201, "totem-order");
-    assertEquals(
-        1,
-        call("GET", "/pedidos?canalPedido=TOTEM&limit=1", null, client, 200).get("items").size());
+    var first = call("POST", "/pedidos", body(2, "TOTEM"), client, 201, "totem-order");
+    var request = body(1, "TOTEM");
+    request.put("itens", List.of(
+        Map.of("produtoId", 1, "quantidade", 1),
+        Map.of("produtoId", 2, "quantidade", 2)));
+    var second = call("POST", "/pedidos", request, client, 201, "totem-order-two");
+    var both = call("GET", "/pedidos?canalPedido=TOTEM", null, client, 200).get("items");
+    assertEquals(2, both.size());
+    assertEquals(second, both.get(0));
+    assertEquals(first, both.get(1));
+    assertEquals(second,
+        call("GET", "/pedidos?canalPedido=TOTEM&limit=1", null, client, 200)
+            .get("items").get(0));
+    assertEquals(first,
+        call("GET", "/pedidos?canalPedido=TOTEM&limit=1&page=2", null, client, 200)
+            .get("items").get(0));
+    assertTrue(call("GET", "/pedidos?canalPedido=TOTEM&limit=1&page=3", null, client, 200)
+        .get("items").isEmpty());
     assertEquals(0, call("GET", "/pedidos?canalPedido=APP", null, client, 200).get("items").size());
     call("GET", "/pedidos?limit=101", null, client, 422);
   }
@@ -216,13 +230,13 @@ class ApiIntegrationTest extends BaseApiTest {
     payment(id, "APROVAR", "payment-1", 201);
     status(id, "CANCELADO", client, 403);
     status(id, "CANCELADO", admin, 200);
-    assertEquals(
-        "ESTORNADO",
+    var payment =
         call("GET", "/pedidos/" + id + "/pagamentos", null, client, 200)
             .get("items")
-            .get(0)
-            .get("status")
-            .asText());
+            .get(0);
+    assertEquals("ESTORNADO", payment.get("status").asText());
+    // A resposta original do gateway é histórica, não o estado atual da tentativa.
+    assertEquals("APROVADO", payment.get("payload").get("status").asText());
   }
 
   @Test

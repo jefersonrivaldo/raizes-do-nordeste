@@ -75,8 +75,38 @@
               }
             }
           },
+          "405" : {
+            "description" : "Método HTTP não permitido",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Representação não aceitável",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "Conflito/regra de negócio",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415" : {
+            "description" : "Tipo de conteúdo não suportado",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -176,8 +206,38 @@
               }
             }
           },
+          "405" : {
+            "description" : "Método HTTP não permitido",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Representação não aceitável",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "Conflito/regra de negócio",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415" : {
+            "description" : "Tipo de conteúdo não suportado",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -277,8 +337,38 @@
               }
             }
           },
+          "405" : {
+            "description" : "Método HTTP não permitido",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Representação não aceitável",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "Conflito/regra de negócio",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415" : {
+            "description" : "Tipo de conteúdo não suportado",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -369,8 +459,38 @@
               }
             }
           },
+          "405" : {
+            "description" : "Método HTTP não permitido",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Representação não aceitável",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "Conflito/regra de negócio",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415" : {
+            "description" : "Tipo de conteúdo não suportado",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -461,8 +581,38 @@
               }
             }
           },
+          "405" : {
+            "description" : "Método HTTP não permitido",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Representação não aceitável",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "Conflito/regra de negócio",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415" : {
+            "description" : "Tipo de conteúdo não suportado",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -483,6 +633,25 @@
           },
           "503" : {
             "description" : "Banco ocupado",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429" : {
+            "description" : "Limite de tentativas excedido",
+            "headers" : {
+              "Retry-After" : {
+                "description" : "Segundos até uma nova tentativa ser permitida",
+                "schema" : {
+                  "type" : "integer",
+                  "format" : "int32"
+                }
+              }
+            },
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -564,8 +733,38 @@
               }
             }
           },
+          "405" : {
+            "description" : "Método HTTP não permitido",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Representação não aceitável",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "Conflito/regra de negócio",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415" : {
+            "description" : "Tipo de conteúdo não suportado",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -652,8 +851,38 @@
               }
             }
           },
+          "405" : {
+            "description" : "Método HTTP não permitido",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Representação não aceitável",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "Conflito/regra de negócio",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415" : {
+            "description" : "Tipo de conteúdo não suportado",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -753,8 +982,38 @@
               }
             }
           },
+          "405" : {
+            "description" : "Método HTTP não permitido",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Representação não aceitável",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "Conflito/regra de negócio",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415" : {
+            "description" : "Tipo de conteúdo não suportado",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -858,8 +1117,38 @@
               }
             }
           },
+          "405" : {
+            "description" : "Método HTTP não permitido",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Representação não aceitável",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "Conflito/regra de negócio",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415" : {
+            "description" : "Tipo de conteúdo não suportado",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -946,8 +1235,38 @@
               }
             }
           },
+          "405" : {
+            "description" : "Método HTTP não permitido",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Representação não aceitável",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "Conflito/regra de negócio",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415" : {
+            "description" : "Tipo de conteúdo não suportado",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1067,8 +1386,38 @@
               }
             }
           },
+          "405" : {
+            "description" : "Método HTTP não permitido",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Representação não aceitável",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "Conflito/regra de negócio",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415" : {
+            "description" : "Tipo de conteúdo não suportado",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1169,8 +1518,38 @@
               }
             }
           },
+          "405" : {
+            "description" : "Método HTTP não permitido",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Representação não aceitável",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "Conflito/regra de negócio",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415" : {
+            "description" : "Tipo de conteúdo não suportado",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1282,8 +1661,38 @@
               }
             }
           },
+          "405" : {
+            "description" : "Método HTTP não permitido",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Representação não aceitável",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "Conflito/regra de negócio",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415" : {
+            "description" : "Tipo de conteúdo não suportado",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1392,8 +1801,38 @@
               }
             }
           },
+          "405" : {
+            "description" : "Método HTTP não permitido",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Representação não aceitável",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "Conflito/regra de negócio",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415" : {
+            "description" : "Tipo de conteúdo não suportado",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1484,8 +1923,38 @@
               }
             }
           },
+          "405" : {
+            "description" : "Método HTTP não permitido",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Representação não aceitável",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "Conflito/regra de negócio",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415" : {
+            "description" : "Tipo de conteúdo não suportado",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1506,6 +1975,25 @@
           },
           "503" : {
             "description" : "Banco ocupado",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429" : {
+            "description" : "Limite de tentativas excedido",
+            "headers" : {
+              "Retry-After" : {
+                "description" : "Segundos até uma nova tentativa ser permitida",
+                "schema" : {
+                  "type" : "integer",
+                  "format" : "int32"
+                }
+              }
+            },
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1584,8 +2072,38 @@
               }
             }
           },
+          "405" : {
+            "description" : "Método HTTP não permitido",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Representação não aceitável",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "Conflito/regra de negócio",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415" : {
+            "description" : "Tipo de conteúdo não suportado",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1666,8 +2184,38 @@
               }
             }
           },
+          "405" : {
+            "description" : "Método HTTP não permitido",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Representação não aceitável",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "Conflito/regra de negócio",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415" : {
+            "description" : "Tipo de conteúdo não suportado",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1739,8 +2287,38 @@
               }
             }
           },
+          "405" : {
+            "description" : "Método HTTP não permitido",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Representação não aceitável",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "Conflito/regra de negócio",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415" : {
+            "description" : "Tipo de conteúdo não suportado",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1852,8 +2430,38 @@
               }
             }
           },
+          "405" : {
+            "description" : "Método HTTP não permitido",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Representação não aceitável",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "Conflito/regra de negócio",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415" : {
+            "description" : "Tipo de conteúdo não suportado",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1965,8 +2573,38 @@
               }
             }
           },
+          "405" : {
+            "description" : "Método HTTP não permitido",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Representação não aceitável",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "Conflito/regra de negócio",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415" : {
+            "description" : "Tipo de conteúdo não suportado",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2054,8 +2692,38 @@
               }
             }
           },
+          "405" : {
+            "description" : "Método HTTP não permitido",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Representação não aceitável",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "Conflito/regra de negócio",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415" : {
+            "description" : "Tipo de conteúdo não suportado",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2139,8 +2807,38 @@
               }
             }
           },
+          "405" : {
+            "description" : "Método HTTP não permitido",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Representação não aceitável",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "Conflito/regra de negócio",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415" : {
+            "description" : "Tipo de conteúdo não suportado",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2242,8 +2940,38 @@
               }
             }
           },
+          "405" : {
+            "description" : "Método HTTP não permitido",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Representação não aceitável",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "Conflito/regra de negócio",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415" : {
+            "description" : "Tipo de conteúdo não suportado",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2347,8 +3075,38 @@
               }
             }
           },
+          "405" : {
+            "description" : "Método HTTP não permitido",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "406" : {
+            "description" : "Representação não aceitável",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "Conflito/regra de negócio",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415" : {
+            "description" : "Tipo de conteúdo não suportado",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2388,6 +3146,11 @@
     "schemas" : {
       "Vinculo" : {
         "type" : "object",
+        "description" : "ATENDENTE, COZINHA e GERENTE exigem unidadeId; CLIENTE e ADMIN exigem unidadeId null.",
+        "example" : {
+          "perfil" : "CLIENTE",
+          "unidadeId" : null
+        },
         "properties" : {
           "perfil" : {
             "type" : "string",
@@ -2402,6 +3165,12 @@
       },
       "UserResponse" : {
         "type" : "object",
+        "example" : {
+          "id" : 2,
+          "nome" : "Maria de estudo",
+          "perfil" : "CLIENTE",
+          "unidadeId" : null
+        },
         "properties" : {
           "id" : {
             "type" : "integer",
@@ -2745,7 +3514,8 @@
             "format" : "int64"
           },
           "status" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "Estado atual da tentativa de pagamento, inclusive ESTORNADO."
           },
           "valorCentavos" : {
             "type" : "integer",
@@ -2753,7 +3523,8 @@
           },
           "payload" : {
             "type" : "object",
-            "additionalProperties" : { }
+            "additionalProperties" : { },
+            "description" : "Resposta original do gateway mock; preservada quando o status muda para ESTORNADO."
           }
         }
       },

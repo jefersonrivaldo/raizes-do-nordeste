@@ -9,9 +9,14 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +27,19 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 public class Errors {
   private ResponseEntity<ErrorResponse> error(
       HttpServletRequest r, int status, String code, String message, List<ErrorDetail> details) {
+    return error(r, status, code, message, details, HttpHeaders.EMPTY);
+  }
+
+  private ResponseEntity<ErrorResponse> error(
+      HttpServletRequest r,
+      int status,
+      String code,
+      String message,
+      List<ErrorDetail> details,
+      HttpHeaders headers) {
     return ResponseEntity.status(status)
+        .headers(headers)
+        .contentType(MediaType.APPLICATION_JSON)
         .body(
             new ErrorResponse(
                 code,
@@ -61,6 +78,37 @@ public class Errors {
   })
   ResponseEntity<ErrorResponse> malformed(Exception e, HttpServletRequest r) {
     return error(r, 422, "VALIDACAO", "Corpo, parâmetros ou cabeçalhos inválidos.", List.of());
+  }
+
+  @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+  ResponseEntity<ErrorResponse> methodNotSupported(
+      HttpRequestMethodNotSupportedException e, HttpServletRequest r) {
+    return error(
+        r, 405, "METODO_NAO_PERMITIDO", "Método HTTP não permitido.", List.of(), e.getHeaders());
+  }
+
+  @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+  ResponseEntity<ErrorResponse> mediaTypeNotSupported(
+      HttpMediaTypeNotSupportedException e, HttpServletRequest r) {
+    return error(
+        r,
+        415,
+        "TIPO_MIDIA_NAO_SUPORTADO",
+        "Tipo de mídia do corpo não suportado.",
+        List.of(),
+        e.getHeaders());
+  }
+
+  @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
+  ResponseEntity<ErrorResponse> mediaTypeNotAcceptable(
+      HttpMediaTypeNotAcceptableException e, HttpServletRequest r) {
+    return error(
+        r,
+        406,
+        "TIPO_MIDIA_NAO_ACEITAVEL",
+        "Tipo de mídia solicitado não disponível.",
+        List.of(),
+        e.getHeaders());
   }
 
   @ExceptionHandler(AccessDeniedException.class)

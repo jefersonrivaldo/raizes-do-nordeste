@@ -18,7 +18,9 @@ import org.springframework.boot.test.web.server.LocalServerPort;
     properties = {
       "spring.datasource.url=jdbc:h2:mem:raizes-test;DB_CLOSE_DELAY=-1;LOCK_TIMEOUT=10000",
       "app.jwt-secret=only-tests-secret-at-least-32-characters-long",
-      "app.seed-password=AdminTeste12345"
+      "app.seed-password=AdminTeste12345",
+      "app.auth-rate-limit-max-requests=100000",
+      "app.order-expiration-scan-ms=3600000"
     })
 abstract class BaseApiTest {
   @LocalServerPort int port;
