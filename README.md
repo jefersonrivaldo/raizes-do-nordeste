@@ -108,10 +108,12 @@ src/test/java/br/com/raizes/      integração HTTP, coleção e documentação 
 scripts/                         ferramentas Java e comandos de Maven/JVM
 ```
 
-- [PDF acadêmico para entrega — RU 4937546](docs/4937546_Projeto_Back_End.pdf), [cópia com nome anterior](docs/relatorio-tecnico.pdf) e [fonte](docs/relatorio.md).
+- O relatório acadêmico em PDF e Word foi removido do Git; as cópias são mantidas localmente pelo autor.
 - [DER PDF](docs/diagramas/der.pdf), [DER SVG](docs/diagramas/der.svg), casos de uso, classes e arquitetura em `docs/diagramas`.
 - [Contratos da API](docs/api.md), [OpenAPI](docs/openapi.json), [coleção](docs/postman_collection.json) e [sequência](docs/sequencia.md).
 - LGPD: BCrypt com custo 12, JWT com expiração, controle por perfil/unidade, auditoria sem credenciais, consentimento revogável e desidentificação que invalida os tokens existentes. IDs históricos permanecem, portanto não há garantia de anonimização irreversível em sistemas externos. Retenção automática não está implementada.
+
+O texto-fonte `docs/relatorio.md` foi removido do Git e deve ser restaurado a partir da cópia local antes de executar os geradores de documentação abaixo. O gerador também recria a cópia `docs/relatorio-tecnico.pdf`. A execução da API e dos testes não depende desses arquivos.
 
 Regenerar documentação com API iniciada (Graphviz, Liberation Serif e DejaVu instalados):
 
