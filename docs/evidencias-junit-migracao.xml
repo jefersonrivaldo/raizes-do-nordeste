@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="br.com.raizes.DatabaseMigrationTest" tests="1" failures="0" errors="0" skipped="0" time="5.918"><testcase name="reabrirBancoPersistentePreservaDadosENaoReaplicaMigracao" classname="br.com.raizes.DatabaseMigrationTest" time="5.79" /></testsuite>

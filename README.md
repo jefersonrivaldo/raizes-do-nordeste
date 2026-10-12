@@ -89,11 +89,11 @@ Crie uma conta de empregado por POST /usuarios. Como ADMIN, atribua perfil com P
 mvn verify
 ```
 
-A suíte JUnit 5 executa 31 testes de integração e um teste que percorre as **20 requisições da coleção**, com 40 grupos de asserções equivalentes ao fluxo Postman: **32 testes JUnit**, sem testes pulados. Usa servidor HTTP real em porta aleatória e banco H2 em memória exclusivo, sem tocar na base de desenvolvimento. Cobre concorrência, idempotência, 401/403/422/409, estoque, negativas/indisponibilidade de pagamento, consentimento, anonimização e repetição de seed.
+A suíte JUnit 5 executa 31 testes de integração, um teste de migração persistente e um teste que percorre as **23 requisições da coleção**, com 46 grupos de asserções equivalentes ao fluxo Postman: **33 testes JUnit**, sem testes pulados. Os testes HTTP usam servidor real em porta aleatória e H2 em memória exclusivo; o teste de migração usa arquivo H2 em diretório temporário. Nenhum deles toca na base de desenvolvimento. Cobre concorrência, idempotência, 401/403/422/409, estoque, negativas/indisponibilidade de pagamento, consentimento, anonimização e repetição de seed.
 
-Evidências ficam em `target/surefire-reports`; resumos sanitizados desta execução estão em `docs/evidencias-junit-api.xml`, `docs/evidencias-junit-colecao.xml` e `docs/evidencias-colecao-java.json`. A evidência é da versão e da máquina em que os testes rodaram; importar a coleção não comprova sucesso.
+Evidências ficam em `target/surefire-reports`; resumos sanitizados desta execução estão em `docs/evidencias-junit-api.xml`, `docs/evidencias-junit-colecao.xml`, `docs/evidencias-junit-migracao.xml` e `docs/evidencias-colecao-java.json`. A evidência é da versão e da máquina em que os testes rodaram; importar a coleção não comprova sucesso.
 
-Para usar Postman, importe [docs/postman_collection.json](docs/postman_collection.json), configure baseUrl para sua API e adminPassword em ambiente local privado. Execute T01–T20 em ordem; cliente e chave são gerados a cada execução. Não exporte senha/tokens da sessão. A coleção movimenta duas unidades do produto 1 no banco utilizado. Plano: [docs/plano-testes.md](docs/plano-testes.md). Ela também é executada por `CollectionContractTest` em Java; Newman não é necessário.
+Para usar Postman, importe [docs/postman_collection.json](docs/postman_collection.json), configure baseUrl para sua API e adminPassword em ambiente local privado. Execute T01–T23 em ordem; cliente e chave são gerados a cada execução. Não exporte senha/tokens da sessão. A coleção movimenta duas unidades do produto 1 no banco utilizado. Plano: [docs/plano-testes.md](docs/plano-testes.md). Ela também é executada por `CollectionContractTest` em Java; Newman não é necessário.
 
 ## Organização e entrega
 
@@ -122,7 +122,7 @@ java -cp "target/test-classes:target/classes:$(cat target/docs-classpath.txt)" b
 
 `Documentation` é Java e usa PDFBox. Não há scripts Python de geração de PDF.
 
-O PDF único inclui capa, folha de rosto, sumário com páginas reais, seções do roteiro, referências, contratos, cenários de testes, evidências e diagramas. Formatação: A4, margens superior/esquerda de 3 cm e inferior/direita de 2 cm, fonte serifada de 12 pontos e espaçamento de 1,5 no texto; tabelas, códigos e referências usam espaçamento simples. Os diagramas ocupam páginas em paisagem. A numeração conta a partir da folha de rosto e aparece na introdução. Os dados de capa ficam em [docs/identificacao-academica.properties](docs/identificacao-academica.properties); curso, polo, cidade e semestre ainda dependem de informação do estudante. O nome Luciane Yanase Kanashiro foi obtido da capa do roteiro da Trilha Back-End. Campos `A INFORMAR` devem ser preenchidos antes da entrega. O manual ABNT institucional completo não foi fornecido e deve ser conferido no AVA.
+O PDF único inclui capa, folha de rosto, sumário com páginas reais, seções do roteiro, referências, contratos, cenários de testes, evidências e diagramas. Formatação: A4, margens superior/esquerda de 3 cm e inferior/direita de 2 cm, fonte serifada de 12 pontos e espaçamento de 1,5 no texto; tabelas, códigos e referências usam espaçamento simples. Os diagramas ocupam páginas em paisagem. A numeração conta a partir da folha de rosto e aparece na introdução. Os dados de capa ficam em [docs/identificacao-academica.properties](docs/identificacao-academica.properties); Curso, período e identificação do trabalho foram fornecidos pelo estudante; polo e cidade permanecem pendentes. O nome Luciane Yanase Kanashiro foi obtido da capa do roteiro da Trilha Back-End. Campos `A INFORMAR` devem ser preenchidos antes da entrega. O manual ABNT institucional completo não foi fornecido e deve ser conferido no AVA.
 
 Para regenerar apenas o PDF, sem chamar a API nem alterar os diagramas:
 
@@ -135,6 +135,10 @@ java -cp "target/test-classes:target/classes:$(cat target/docs-classpath.txt)" b
 
 Use o checkout existente; cada tarefa já tem ambiente isolado, sem criar worktrees. Dependências e arquivos podem ser retidos no snapshot, mas a JVM precisa ser reiniciada em uma nova tarefa. `install_script` e `start_skill` são instruções salvas; salvar não executa nem publica o ambiente.
 
-O código Java foi preparado para envio autorizado à branch main de https://github.com/jefersonrivaldo/raizes-do-nordeste . Os links de download sem login retornaram 404 nesta sessão; entre na sua conta GitHub com acesso ao repositório. A visibilidade pública para avaliação ainda deve ser verificada pelo proprietário. Não foi feito deploy público ou fabricado histórico acadêmico de commits.
+O código Java foi preparado para envio autorizado à branch main de https://github.com/jefersonrivaldo/raizes-do-nordeste . Repositório e coleção foram verificados sem autenticação em 11/10/2026 e retornaram HTTP 200. O acesso público está disponível para avaliação. Não foi feito deploy público ou fabricado histórico acadêmico de commits.
 
 O roteiro fornecido é uma cópia adaptada para estudo. Revise a versão oficial, o código e o relatório; confira a identificação acadêmica e ajuste a formatação exigida antes da entrega. H2 em arquivo é destinado ao estudo, sem alta disponibilidade validada. TLS público, rate limiting, banco de produção, backup, expiração de reservas e retenção automática são evoluções propostas. Pagamento e estorno são exclusivamente mock.
+
+A coleção possui sete pastas sequenciais; execute todas em ordem T01–T23. O executor Java percorre pastas recursivamente. O teste de migração cria um H2 em arquivo, grava uma unidade, fecha a conexão e reabre o banco: Flyway valida o checksum, não reaplica V1 e preserva o registro.
+
+Validação adicional da coleção: Newman 6.2.1 executou os scripts Postman reais das sete pastas, com 23 requisições e 46 asserções aprovadas. Resumo sanitizado: [docs/evidencias-postman-newman.json](docs/evidencias-postman-newman.json). O runner externo não é uma dependência da API nem requisito para os testes Java.

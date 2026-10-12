@@ -1,0 +1,14 @@
+{
+  "executadoEm": "2026-10-11T21:17:20.719407+00:00",
+  "executor": "Newman 6.2.1",
+  "baseDaRevisao": "07566134fbda88e93923c58b6dd407f999ba24ba",
+  "requisicoes": 23,
+  "pastas": 7,
+  "assercoes": 46,
+  "falhas": 0,
+  "positivos2xx": 14,
+  "negativos4xx": 9,
+  "banco": "H2 em arquivo temporário isolado; removido após execução",
+  "scriptsPostmanExecutados": true,
+  "credenciaisOmitidas": true
+}

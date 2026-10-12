@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 
-/** Executa as 20 requisições da coleção usando Java, sem depender de Node/Python. */
+/** Executa as 23 requisições da coleção usando Java, sem depender de Node/Python. */
 class CollectionContractTest extends BaseApiTest {
   @Test
   void collectionInteiraComResultadosEsperados() throws Exception {
@@ -20,7 +20,7 @@ class CollectionContractTest extends BaseApiTest {
     vars.put("runId", UUID.randomUUID().toString());
     vars.put("clientEmail", "cliente-" + vars.get("runId") + "@example.com");
     int requests = 0, assertions = 0;
-    for (JsonNode item : collection.get("item")) {
+    for (JsonNode item : requestsInOrder(collection.get("item"))) {
       String name = item.get("name").asText();
       String id = name.substring(0, 3);
       var request = item.get("request");
@@ -82,6 +82,12 @@ class CollectionContractTest extends BaseApiTest {
                 && order.get("canalPedido").asText().equals("TOTEM")) found = true;
           assertTrue(found);
         }
+        case "T23" -> {
+          boolean found = false;
+          for (JsonNode event : response.get("items"))
+            if (event.path("acao").asText().equals("PEDIDO_CRIADO")) found = true;
+          assertTrue(found, "Criação de pedido deve gerar auditoria");
+        }
         default -> {
           assertEquals(6, response.size());
           for (String field :
@@ -91,8 +97,8 @@ class CollectionContractTest extends BaseApiTest {
       }
       assertions++;
     }
-    assertEquals(20, requests);
-    assertEquals(40, assertions);
+    assertEquals(23, requests);
+    assertEquals(46, assertions);
     Files.writeString(
         Path.of("target/evidencias-colecao-java.json"),
         json.writerWithDefaultPrettyPrinter()
@@ -109,6 +115,15 @@ class CollectionContractTest extends BaseApiTest {
                         "falhas",
                         0))
             + "\n");
+  }
+
+  private List<JsonNode> requestsInOrder(JsonNode items) {
+    var requests = new ArrayList<JsonNode>();
+    for (JsonNode item : items) {
+      if (item.has("item")) requests.addAll(requestsInOrder(item.get("item")));
+      else requests.add(item);
+    }
+    return requests;
   }
 
   private String substitute(String text, Map<String, String> vars) {
