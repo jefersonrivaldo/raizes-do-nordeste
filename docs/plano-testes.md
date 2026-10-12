@@ -1,6 +1,6 @@
 # Plano de testes executável
 
-Executar no Postman na ordem indicada; a mesma coleção é validada pelo teste Java CollectionContractTest. Executar na ordem indicada com banco criado pelo seed. Cada cenário tem asserções na coleção. CLIENTE é criado em cada execução; adminPassword é configurado localmente e não deve ser exportado. Unidade 1 e produto 1 vêm do seed.
+Executar no Postman as sete pastas em ordem, mantendo T01–T23; a mesma coleção é validada pelo teste Java CollectionContractTest. Executar na ordem indicada com banco criado pelo seed. Cada cenário tem asserções na coleção. CLIENTE é criado em cada execução; adminPassword é configurado localmente e não deve ser exportado. Unidade 1 e produto 1 vêm do seed.
 
 | ID | Requisição e entrada | Pré-condição | Saída esperada |
 |---|---|---|---|
@@ -24,6 +24,10 @@ Executar no Postman na ordem indicada; a mesma coleção é validada pelo teste 
 | T18 Estoque insuficiente | `POST /pedidos`; `{"unidadeId": 1, "canalPedido": "TOTEM", "itens": [{"produtoId": 1, "quantidade": 1000}], "formaPagamento": "MOCK"}` | Seed com saldo de 100; não adicionar estoque antes deste teste | HTTP 409; asserções na requisição homônima |
 | T19 Pedido inexistente | `GET /pedidos/999999999`; `Sem corpo` | Fluxo anterior concluído | HTTP 404; asserções na requisição homônima |
 | T20 Transição inválida | `PATCH /pedidos/{{pedidoId}}/status`; `{"status": "PRONTO"}` | Fluxo anterior concluído | HTTP 409; asserções na requisição homônima |
+
+| T21 Unidade inexistente | `POST /pedidos`; unidadeId = 999999999; demais campos válidos | CLIENTE autenticado; chave de idempotência nova | HTTP 404; envelope de erro padronizado |
+| T22 Produto inexistente | `POST /pedidos`; produtoId = 999999999; demais campos válidos | CLIENTE autenticado; chave de idempotência nova | HTTP 404; envelope de erro padronizado |
+| T23 Auditoria de criação do pedido | `GET /auditoria?page=1&limit=100` | ADMIN autenticado; pedido criado anteriormente | HTTP 200; items contém evento PEDIDO_CRIADO |
 
 ## Critérios de aceitação e evidências por cenário
 
@@ -52,6 +56,10 @@ A evidência de cada linha é a requisição de mesmo ID e nome em `docs/postman
 | T19 | Mesmas seis chaves do padrão de erro | Requisição T19; erro 404 para pedido inexistente |
 | T20 | Mesmas seis chaves do padrão de erro | Requisição T20; erro 409 ao tentar reabrir pedido entregue |
 
+| T21 | Mesmas seis chaves do padrão de erro | Requisição T21; unidade inexistente na criação de pedido |
+| T22 | Mesmas seis chaves do padrão de erro | Requisição T22; produto inexistente na criação de pedido |
+| T23 | items contém evento PEDIDO_CRIADO | Requisição T23; consulta ADMIN comprova auditoria |
+
 ## Testes automatizados complementares
 
 | Teste JUnit | Entrada e pré-condição | Resultado verificado |
@@ -60,4 +68,4 @@ A evidência de cada linha é a requisição de mesmo ID e nome em `docs/postman
 | cupomERecursoAusente | Pedido com NORDESTE10; depois unidadeId = 999 | Desconto produz totalCentavos = 4500; unidade ausente retorna 404 |
 | quantidadeFracionariaRejeitada | POST /pedidos com quantidade = 1.5 | HTTP 422; inteiro exigido |
 
-Esses três casos são testes Java, não requisições adicionais da coleção Postman. A coleção atual contém 20 cenários em lista; a organização em pastas e a inclusão de chamadas próprias de auditoria e unidade/produto inexistente permanecem melhorias pendentes. A suíte Java verifica comportamentos adicionais sem substituir os artefatos solicitados pela trilha.
+Esses três casos são testes Java, não requisições adicionais da coleção Postman. A coleção contém 23 cenários em sete pastas, incluindo auditoria e unidade/produto inexistente. A suíte Java verifica comportamentos adicionais sem substituir os artefatos solicitados pela trilha.

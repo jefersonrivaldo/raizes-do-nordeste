@@ -320,7 +320,7 @@ public final class AcademicReport implements AutoCloseable {
     centered("JEFERSON RIVALDO SANTOS", 645, true);
     centered("RU: " + p("ru"), 623, false);
     centered("RAÍZES DO NORDESTE", 460, true);
-    centered("PROJETO MULTIDISCIPLINAR — TRILHA BACK-END", 432, true);
+    centered(p("disciplina").toUpperCase(Locale.ROOT), 432, true);
     centered("Polo de apoio: " + p("polo"), 345, false);
     centered("Semestre/período: " + p("semestre"), 322, false);
     centered("Professor(a): " + p("professor"), 299, false);
@@ -330,7 +330,7 @@ public final class AcademicReport implements AutoCloseable {
     centered(p("nome").toUpperCase(Locale.ROOT), 745, true);
     centered("RU: " + p("ru"), 721, false);
     centered("RAÍZES DO NORDESTE", 545, true);
-    centered("PROJETO MULTIDISCIPLINAR — TRILHA BACK-END", 518, true);
+    centered(p("disciplina").toUpperCase(Locale.ROOT), 518, true);
     y = 395;
     for (String line :
         wrap(
@@ -364,12 +364,12 @@ public final class AcademicReport implements AutoCloseable {
     factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
     List<String> rows =
         new ArrayList<>(List.of("| Suíte | Executados | Falhas / erros / ignorados |"));
-    for (String name : List.of("ApiIntegrationTest", "CollectionContractTest")) {
+    for (String name : List.of("ApiIntegrationTest", "CollectionContractTest", "DatabaseMigrationTest")) {
       Path file = Path.of("target/surefire-reports/TEST-br.com.raizes." + name + ".xml");
       if (!Files.exists(file))
         file =
             Path.of(
-                "docs/evidencias-junit-" + (name.startsWith("Api") ? "api" : "colecao") + ".xml");
+                "docs/evidencias-junit-" + (name.startsWith("Api") ? "api" : name.startsWith("Collection") ? "colecao" : "migracao") + ".xml");
       var root = factory.newDocumentBuilder().parse(file.toFile()).getDocumentElement();
       rows.add(
           "| "
@@ -386,21 +386,21 @@ public final class AcademicReport implements AutoCloseable {
     }
     table(rows);
     paragraph(
-        "Comando de validação: ./scripts/mvn.sh verify. Resultado da execução verificada em 11 out."
-            + " 2026, às 13h14min30s (America/Sao_Paulo): BUILD SUCCESS; 32 testes, zero falhas,"
-            + " zero erros e zero ignorados. Os relatórios de execução estão em"
-            + " target/surefire-reports; cópias sanitizadas estão em docs/evidencias-junit-api.xml"
-            + " e docs/evidencias-junit-colecao.xml. A autoria do Git foi corrigida posteriormente;"
-            + " os hashes mudaram sem alterar o conteúdo testado.");
+        "Comando de validação: mvn verify. A execução registrada nesta revisão de 11 out. 2026 "
+            + "aprovou 33 testes Java: 31 de integração, um executor de 23 requisições da coleção "
+            + "e um de migração em arquivo H2 existente; zero falhas, erros ou ignorados. "
+            + "O executor percorre as sete pastas da coleção na ordem do fluxo. "
+            + "Os relatórios sanitizados estão em docs/evidencias-junit-api.xml, "
+            + "docs/evidencias-junit-colecao.xml e docs/evidencias-junit-migracao.xml.");
     ObjectMapper mapper = new ObjectMapper();
     for (String file :
-        List.of("docs/evidencias-colecao-java.json", "docs/evidencias-runtime-java.json")) {
+        List.of("docs/evidencias-colecao-java.json", "docs/evidencias-runtime-java.json", "docs/evidencias-postman-newman.json")) {
       paragraph(
           "Registro: "
               + file
               + ". A data executadoEm está expressa em UTC. A coleção foi validada em Java com"
-              + " asserções equivalentes; este registro não afirma execução pelo aplicativo"
-              + " Postman.");
+              + " asserções equivalentes em Java; o arquivo separado de Newman registra a execução"
+              + " dos scripts Postman reais. O registro de runtime mantém sua data histórica.");
       codeLine(
           mapper
               .writerWithDefaultPrettyPrinter()
